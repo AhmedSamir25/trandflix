@@ -1,0 +1,201 @@
+{
+  "base_url": "http://localhost:3000",
+  "routes": {
+    "auth": [
+      {
+        "name": "register",
+        "method": "POST",
+        "path": "/auth/register",
+        "auth_required": false,
+        "request_body": {
+          "name": "Ahmed Ali",
+          "email": "ahmed@example.com",
+          "password": "12345678",
+          "avatar": "https://example.com/avatar.jpg"
+        }
+      },
+      {
+        "name": "login",
+        "method": "POST",
+        "path": "/auth/login",
+        "auth_required": false,
+        "request_body": {
+          "email": "ahmed@example.com",
+          "password": "12345678"
+        }
+      },
+      {
+        "name": "reset_password_request",
+        "method": "POST",
+        "path": "/auth/reset-password/request",
+        "auth_required": false,
+        "request_body": {
+          "email": "ahmed@example.com"
+        }
+      },
+      {
+        "name": "reset_password",
+        "method": "POST",
+        "path": "/auth/reset-password",
+        "auth_required": false,
+        "request_body": {
+          "email": "ahmed@example.com",
+          "code": "123456",
+          "new_password": "newpassword123"
+        }
+      }
+    ],
+    "categories": [
+      {
+        "name": "create_category",
+        "method": "POST",
+        "path": "/categories",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": {
+          "name": "Action",
+          "slug": "action"
+        }
+      },
+      {
+        "name": "update_category",
+        "method": "PUT",
+        "path": "/categories/:id",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      },
+      {
+        "name": "delete_category",
+        "method": "DELETE",
+        "path": "/categories/:id",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": null
+      }
+    ],
+    "items": [
+      {
+        "name": "get_items",
+        "method": "GET",
+        "path": "/items",
+        "auth_required": false,
+        "request_body": null
+      },
+      {
+        "name": "get_item_by_id",
+        "method": "GET",
+        "path": "/items/:id",
+        "auth_required": false,
+        "request_body": null
+      },
+      {
+        "name": "create_item_movie",
+        "method": "POST",
+        "path": "/items",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": {
+          "title": "Inception",
+          "description": "Sci-fi movie",
+          "type": "movie",
+          "cover_image": "cover.jpg",
+          "release_date": "2010-07-16",
+          "director": "Christopher Nolan",
+          "duration": 148,
+          "rating": 9.1,
+          "category_ids": [1, 2]
+        }
+      },
+      {
+        "name": "create_item_book",
+        "method": "POST",
+        "path": "/items",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": {
+          "title": "The Hobbit",
+          "description": "Fantasy novel",
+          "type": "book",
+          "cover_image": "hobbit.jpg",
+          "release_date": "1937-09-21",
+          "author": "J. R. R. Tolkien",
+          "pages_count": 310,
+          "rating": 8.8,
+          "category_ids": [2, 3]
+        }
+      },
+      {
+        "name": "create_item_game",
+        "method": "POST",
+        "path": "/items",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": {
+          "title": "God of War",
+          "description": "Action adventure game",
+          "type": "game",
+          "cover_image": "gow.jpg",
+          "release_date": "2018-04-20",
+          "developer": "Santa Monica Studio",
+          "platform": "PlayStation",
+          "rating": 9.5,
+          "category_ids": [1, 4]
+        }
+      },
+      {
+        "name": "update_item",
+        "method": "PUT",
+        "path": "/items/:id",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": {
+          "title": "Inception Updated",
+          "description": "Sci-fi thriller movie",
+          "type": "movie",
+          "cover_image": "cover-updated.jpg",
+          "release_date": "2010-07-16",
+          "director": "Christopher Nolan",
+          "duration": 148,
+          "rating": 9.3,
+          "category_ids": [1, 2, 5]
+        }
+      },
+      {
+        "name": "delete_item",
+        "method": "DELETE",
+        "path": "/items/:id",
+        "auth_required": true,
+        "role_required": "admin",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": null
+      }
+    ]
+  }
+}
