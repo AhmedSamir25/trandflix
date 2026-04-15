@@ -2,35 +2,40 @@ package utils
 
 import (
 	"fmt"
-	"net/smtp"
 	"os"
 	"strings"
+
+	"github.com/resend/resend-go/v3"
 )
 
 func SendEmail(to, subject, resetCode string) error {
-	host := strings.TrimSpace(os.Getenv("SMTP_HOST"))
-	port := strings.TrimSpace(os.Getenv("SMTP_PORT"))
-	from := strings.TrimSpace(os.Getenv("SMTP_FROM"))
-	username := strings.TrimSpace(os.Getenv("SMTP_USER"))
-	password := os.Getenv("SMTP_PASS")
+	apiKey := strings.TrimSpace(os.Getenv("RESEND_API_KEYi"))
+	from := strings.TrimSpace(os.Getenv("RESEND_FROM_EMAIL"))
 
-	if host == "" || port == "" || from == "" {
-		return fmt.Errorf("smtp is not configured")
+	if apiKey == "" || apiKey == "re_xxxxxxxxx" {
+		return fmt.Errorf("resend api key is not configured; replace re_xxxxxxxxx with your real API key")
 	}
 
-	message := []byte(
-		"To: " + to + "\r\n" +
-			"Subject: " + subject + "\r\n" +
-			"MIME-Version: 1.0\r\n" +
-			"Content-Type: text/plain; charset=UTF-8\r\n\r\n" +
-			"Your password reset code is: " + resetCode + "\r\n" +
-			"This code will expire soon.\r\n",
-	)
-
-	var auth smtp.Auth
-	if username != "" || password != "" {
-		auth = smtp.PlainAuth("", username, password, host)
+	if from == "" {
+		from = "onboarding@resend.dev"
 	}
 
-	return smtp.SendMail(host+":"+port, auth, from, []string{to}, message)
+	client := resend.NewClient(apiKey)
+	params := &resend.SendEmailRequest{
+		From:    from,
+		To:      []string{to},
+		Subject: subject,
+		Html:    buildResetEmailHTML(resetCode),
+	}
+
+	if _, err := client.Emails.Send(params); err != nil {
+		return fmt.Errorf("failed to send email with resend: %w", err)
+	}
+
+	return nil
+}
+
+func buildResetEmailHTML(resetCode string) string {
+	return "<p>Your password reset code is: <strong>" + resetCode + "</strong></p>" +
+		"<p>This code will expire soon.</p>"
 }

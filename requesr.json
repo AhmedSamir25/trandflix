@@ -11,7 +11,7 @@
           "name": "Ahmed Ali",
           "email": "ahmed@example.com",
           "password": "12345678",
-          "avatar": "https://example.com/avatar.jpg"
+          "avatar": "/upload/avatars/<uploaded_avatar>.jpg"
         }
       },
       {
@@ -114,7 +114,7 @@
           "title": "Inception",
           "description": "Sci-fi movie",
           "type": "movie",
-          "cover_image": "cover.jpg",
+          "cover_image": "/upload/items/<uploaded_movie_cover>.jpg",
           "release_date": "2010-07-16",
           "director": "Christopher Nolan",
           "duration": 148,
@@ -135,7 +135,7 @@
           "title": "The Hobbit",
           "description": "Fantasy novel",
           "type": "book",
-          "cover_image": "hobbit.jpg",
+          "cover_image": "/upload/items/<uploaded_book_cover>.jpg",
           "release_date": "1937-09-21",
           "author": "J. R. R. Tolkien",
           "pages_count": 310,
@@ -156,7 +156,7 @@
           "title": "God of War",
           "description": "Action adventure game",
           "type": "game",
-          "cover_image": "gow.jpg",
+          "cover_image": "/upload/items/<uploaded_game_cover>.jpg",
           "release_date": "2018-04-20",
           "developer": "Santa Monica Studio",
           "platform": "PlayStation",
@@ -177,7 +177,7 @@
           "title": "Inception Updated",
           "description": "Sci-fi thriller movie",
           "type": "movie",
-          "cover_image": "cover-updated.jpg",
+          "cover_image": "/upload/items/<uploaded_updated_cover>.jpg",
           "release_date": "2010-07-16",
           "director": "Christopher Nolan",
           "duration": 148,
@@ -195,6 +195,100 @@
           "Authorization": "Bearer <admin_token>"
         },
         "request_body": null
+      }
+    ],
+    "favorites": [
+      {
+        "name": "add_favorite",
+        "method": "POST",
+        "path": "/favorites/:item_id",
+        "auth_required": true,
+        "headers": {
+          "Authorization": "Bearer <user_token>"
+        },
+        "request_body": null
+      },
+      {
+        "name": "remove_favorite",
+        "method": "DELETE",
+        "path": "/favorites/:item_id",
+        "auth_required": true,
+        "headers": {
+          "Authorization": "Bearer <user_token>"
+        },
+        "request_body": null
+      }
+    ],
+    "reviews": [
+      {
+        "name": "get_reviews_by_item",
+        "method": "GET",
+        "path": "/reviews/item/:item_id",
+        "auth_required": false,
+        "request_body": null
+      },
+      {
+        "name": "create_review",
+        "method": "POST",
+        "path": "/reviews",
+        "auth_required": true,
+        "headers": {
+          "Authorization": "Bearer <user_token>"
+        },
+        "request_body": {
+          "item_id": 1,
+          "rating": 5,
+          "comment": "Amazing item"
+        }
+      },
+      {
+        "name": "update_review",
+        "method": "PUT",
+        "path": "/reviews/:id",
+        "auth_required": true,
+        "headers": {
+          "Authorization": "Bearer <user_token>"
+        },
+        "request_body": {
+          "rating": 4,
+          "comment": "Still good after update"
+        }
+      },
+      {
+        "name": "delete_review",
+        "method": "DELETE",
+        "path": "/reviews/:id",
+        "auth_required": true,
+        "headers": {
+          "Authorization": "Bearer <user_token>"
+        },
+        "request_body": null
+      }
+    ],
+    "upload": [
+      {
+        "name": "upload_avatar",
+        "method": "POST",
+        "path": "/upload/avatar",
+        "auth_required": false,
+        "content_type": "multipart/form-data",
+        "request_body": {
+          "file": "<image_file>"
+        }
+      },
+      {
+        "name": "upload_item_image",
+        "method": "POST",
+        "path": "/upload/item-image",
+        "auth_required": true,
+        "role_required": "admin",
+        "content_type": "multipart/form-data",
+        "headers": {
+          "Authorization": "Bearer <admin_token>"
+        },
+        "request_body": {
+          "file": "<image_file>"
+        }
       }
     ]
   }
