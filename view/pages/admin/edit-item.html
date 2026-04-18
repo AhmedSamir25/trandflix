@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.editItemPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Edit Item</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/admin-shared.js"></script>
+    <script defer src="/assets/js/admin-item-form.js"></script>
+  </head>
+  <body data-item-form-mode="edit">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" data-i18n="admin.editItemHeading">Edit Item</h1>
+          <p class="admin-subtitle" data-i18n="admin.editItemSubtitle">Update an existing movie, game, or book in the catalog.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/admin/catalog.html" data-i18n="admin.navCatalog">Catalog</a>
+          <button class="btn primary compact-btn" id="logoutBtn" type="button" data-i18n="admin.logout">Logout</button>
+        </div>
+      </header>
+
+      <nav class="admin-top-nav">
+        <a class="admin-nav-link" href="/pages/admin.html" data-i18n="admin.navDashboard">Dashboard</a>
+        <a class="admin-nav-link" href="/pages/admin/categories.html" data-i18n="admin.navCategories">Categories</a>
+        <a class="admin-nav-link" href="/pages/admin/create-item.html" data-i18n="admin.navCreateItem">Create Item</a>
+        <a class="admin-nav-link" href="/pages/admin/catalog.html" data-i18n="admin.navCatalog">Catalog</a>
+      </nav>
+
+      <p id="pageError" class="notice error-notice" hidden></p>
+
+      <section class="dashboard-grid single-col">
+        <article class="card panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.itemKicker">Items</p>
+              <h2 data-i18n="admin.editItemTitle">Update item details</h2>
+            </div>
+          </div>
+
+          <form id="itemForm" class="form-stack">
+            <div class="form-grid two-col">
+              <label class="field">
+                <span data-i18n="admin.itemName">Title</span>
+                <input name="title" type="text" required />
+              </label>
+              <label class="field">
+                <span data-i18n="admin.itemType">Type</span>
+                <select id="itemType" name="type">
+                  <option value="movie" data-i18n="admin.typeMovie">Movie</option>
+                  <option value="game" data-i18n="admin.typeGame">Game</option>
+                  <option value="book" data-i18n="admin.typeBook">Book</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span data-i18n="admin.itemDescription">Description</span>
+              <textarea name="description" rows="4"></textarea>
+            </label>
+
+            <div class="form-grid two-col">
+              <label class="field">
+                <span data-i18n="admin.releaseDate">Release date</span>
+                <input name="release_date" type="date" required />
+              </label>
+              <label class="field">
+                <span data-i18n="admin.rating">Rating</span>
+                <input name="rating" type="number" min="0" max="10" step="0.1" value="0" />
+              </label>
+            </div>
+
+            <div class="form-grid image-grid">
+              <label class="field grow-field">
+                <span data-i18n="admin.coverImage">Cover image URL</span>
+                <input
+                  id="coverImageInput"
+                  name="cover_image"
+                  type="url"
+                  placeholder="https://example.com/cover.jpg"
+                  data-i18n-placeholder="admin.coverImagePlaceholder"
+                />
+              </label>
+              <label class="field">
+                <span data-i18n="admin.uploadImage">Upload image</span>
+                <input id="coverImageFile" name="cover_upload" type="file" accept="image/*" />
+              </label>
+            </div>
+
+            <div class="preview-block" id="imagePreviewBlock" hidden>
+              <img id="imagePreview" class="image-preview" alt="Preview" data-i18n-alt="admin.imagePreviewAlt" />
+            </div>
+
+            <div class="form-grid two-col" id="actionLinkFields">
+              <label class="field" data-field-for="movie">
+                <span data-i18n="admin.contentLinkMovie">Watch link</span>
+                <input
+                  name="content_link"
+                  type="url"
+                  placeholder="https://example.com/watch"
+                  data-i18n-placeholder="admin.contentLinkMoviePlaceholder"
+                />
+              </label>
+              <label class="field" data-field-for="game">
+                <span data-i18n="admin.contentLinkGame">Play link</span>
+                <input
+                  name="content_link"
+                  type="url"
+                  placeholder="https://example.com/play"
+                  data-i18n-placeholder="admin.contentLinkGamePlaceholder"
+                  disabled
+                />
+              </label>
+              <label class="field" data-field-for="book">
+                <span data-i18n="admin.contentLinkBook">Read link</span>
+                <input
+                  name="content_link"
+                  type="url"
+                  placeholder="https://example.com/read"
+                  data-i18n-placeholder="admin.contentLinkBookPlaceholder"
+                  disabled
+                />
+              </label>
+            </div>
+
+            <div class="form-grid two-col" id="typeSpecificFields">
+              <label class="field" data-field-for="book">
+                <span data-i18n="admin.author">Author</span>
+                <input name="author" type="text" />
+              </label>
+              <label class="field" data-field-for="book">
+                <span data-i18n="admin.pagesCount">Pages count</span>
+                <input name="pages_count" type="number" min="1" step="1" />
+              </label>
+
+              <label class="field" data-field-for="movie">
+                <span data-i18n="admin.director">Director</span>
+                <input name="director" type="text" />
+              </label>
+              <label class="field" data-field-for="movie">
+                <span data-i18n="admin.duration">Duration (minutes)</span>
+                <input name="duration" type="number" min="1" step="1" />
+              </label>
+
+              <label class="field" data-field-for="game">
+                <span data-i18n="admin.developer">Developer</span>
+                <input name="developer" type="text" />
+              </label>
+              <label class="field" data-field-for="game">
+                <span data-i18n="admin.platform">Platform</span>
+                <input name="platform" type="text" />
+              </label>
+            </div>
+
+            <div class="list-block">
+              <div class="list-header">
+                <h3 data-i18n="admin.assignCategories">Assign categories</h3>
+              </div>
+              <div id="itemCategoryList" class="checkbox-list"></div>
+            </div>
+
+            <button class="btn primary" id="itemSubmitBtn" type="submit" data-i18n="admin.saveChanges">Save changes</button>
+            <p id="itemStatus" class="notice" hidden></p>
+          </form>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

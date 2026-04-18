@@ -1,0 +1,143 @@
+.favorites-shell {
+  min-height: 100%;
+  padding: 20px;
+}
+
+.favorites-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.back-link {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.favorites-brand {
+  color: var(--primary);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.favorites-hero {
+  padding: 32px 0 24px;
+}
+
+.favorites-kicker {
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+}
+
+.favorites-hero h1 {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 44px);
+}
+
+.favorites-subtitle {
+  margin: 10px 0 0;
+  color: var(--muted);
+  max-width: 560px;
+}
+
+.favorites-status {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.favorite-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+}
+
+.favorite-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 75%, white);
+  outline-offset: 3px;
+}
+
+.favorite-cover {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  display: block;
+}
+
+.favorite-body {
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.favorite-type {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.favorite-title {
+  margin: 0;
+  font-size: 17px;
+}
+
+.favorite-meta,
+.favorite-categories {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.favorite-remove {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(2, 6, 23, 0.72);
+  color: #ff7a7a;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+html[dir="rtl"] .favorite-remove {
+  right: auto;
+  left: 12px;
+}
+
+@media (max-width: 640px) {
+  .favorites-shell {
+    padding: 16px;
+  }
+
+  .favorites-topbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .favorites-brand {
+    order: -1;
+    width: 100%;
+  }
+}

@@ -18,6 +18,32 @@ type categoryRequest struct {
 	Slug string `json:"slug"`
 }
 
+func GetCategories(c *fiber.Ctx) error {
+	context := fiber.Map{
+		"statusText": "Ok",
+		"msg":        "Categories fetched successfully",
+	}
+
+	if database.DbConn == nil {
+		log.Println("database connection is not initialized")
+		context["statusText"] = "bad"
+		context["msg"] = "Database error"
+		return c.Status(fiber.StatusInternalServerError).JSON(context)
+	}
+
+	var categories []models.Category
+	result := database.DbConn.Order("name ASC").Find(&categories)
+	if result.Error != nil {
+		log.Println("Error fetching categories:", result.Error)
+		context["statusText"] = "bad"
+		context["msg"] = "Database error"
+		return c.Status(fiber.StatusInternalServerError).JSON(context)
+	}
+
+	context["categories"] = categories
+	return c.Status(fiber.StatusOK).JSON(context)
+}
+
 func CreateCategory(c *fiber.Ctx) error {
 	context := fiber.Map{
 		"statusText": "Ok",

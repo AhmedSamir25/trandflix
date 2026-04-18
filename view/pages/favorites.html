@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="favorites.pageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Favorites</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/favorites.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/favorites.js"></script>
+  </head>
+  <body>
+    <div class="favorites-shell">
+      <nav class="favorites-topbar">
+        <a class="back-link" href="/pages/app.html">← <span data-i18n="favorites.backToHome">Back to Home</span></a>
+        <span class="favorites-brand">TrendFlix</span>
+        <div class="lang-menu">
+          <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+          <div class="lang-menu-list" data-lang-menu>
+            <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+            <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+          </div>
+        </div>
+      </nav>
+
+      <header class="favorites-hero">
+        <p class="favorites-kicker" data-i18n="favorites.kicker">Your collection</p>
+        <h1 data-i18n="favorites.heading">Favorites</h1>
+        <p class="favorites-subtitle" data-i18n="favorites.subtitle">Movies, games, and books you saved for later.</p>
+      </header>
+
+      <main>
+        <div class="favorites-status" id="favoritesStatus" data-i18n="favorites.loading">Loading favorites...</div>
+        <section class="favorites-grid" id="favoritesGrid" hidden></section>
+      </main>
+    </div>
+  </body>
+</html>

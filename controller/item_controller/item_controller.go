@@ -19,6 +19,7 @@ type itemRequest struct {
 	Description string  `json:"description"`
 	Type        string  `json:"type"`
 	CoverImage  string  `json:"cover_image"`
+	ContentLink *string `json:"content_link"`
 	ReleaseDate string  `json:"release_date"`
 	Author      *string `json:"author"`
 	Director    *string `json:"director"`
@@ -246,6 +247,7 @@ func UpdateItem(c *fiber.Ctx) error {
 	item.Description = updatedItem.Description
 	item.Type = updatedItem.Type
 	item.CoverImage = updatedItem.CoverImage
+	item.ContentLink = updatedItem.ContentLink
 	item.ReleaseDate = updatedItem.ReleaseDate
 	item.Author = updatedItem.Author
 	item.Director = updatedItem.Director
@@ -381,6 +383,7 @@ func buildItemFromRequest(request itemRequest) (models.Item, string, int) {
 	request.Description = strings.TrimSpace(request.Description)
 	request.Type = strings.ToLower(strings.TrimSpace(request.Type))
 	request.CoverImage = strings.TrimSpace(request.CoverImage)
+	request.ContentLink = normalizeOptionalString(request.ContentLink)
 	request.ReleaseDate = strings.TrimSpace(request.ReleaseDate)
 	request.Author = normalizeOptionalString(request.Author)
 	request.Director = normalizeOptionalString(request.Director)
@@ -405,6 +408,7 @@ func buildItemFromRequest(request itemRequest) (models.Item, string, int) {
 		Description: request.Description,
 		Type:        request.Type,
 		CoverImage:  request.CoverImage,
+		ContentLink: request.ContentLink,
 		ReleaseDate: releaseDate,
 		Author:      request.Author,
 		Director:    request.Director,

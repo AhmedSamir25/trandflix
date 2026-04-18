@@ -8,6 +8,7 @@ type Item struct {
 	Description string     `gorm:"column:description;type:text" json:"description"`
 	Type        string     `gorm:"column:type;not null" json:"type"`
 	CoverImage  string     `gorm:"column:cover_image" json:"cover_image"`
+	ContentLink *string    `gorm:"column:content_link" json:"content_link"`
 	ReleaseDate time.Time  `gorm:"column:release_date;type:date" json:"release_date"`
 	Author      *string    `gorm:"column:author" json:"author"`
 	Director    *string    `gorm:"column:director" json:"director"`

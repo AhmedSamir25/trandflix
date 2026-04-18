@@ -100,7 +100,16 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(context)
 	}
 
+	token, err := generateAuthToken(record)
+	if err != nil {
+		log.Println("Error generating token:", err)
+		context["statusText"] = "bad"
+		context["msg"] = "Error generating token"
+		return c.Status(fiber.StatusInternalServerError).JSON(context)
+	}
+
 	context["id"] = record.ID
+	context["token"] = token
 	context["msg"] = "User created successfully"
 	return c.Status(fiber.StatusCreated).JSON(context)
 }

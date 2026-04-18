@@ -13,6 +13,43 @@ import (
 	"trendflix/models"
 )
 
+func GetFavorites(c *fiber.Ctx) error {
+	context := fiber.Map{
+		"statusText": "Ok",
+		"msg":        "Favorites fetched successfully",
+	}
+
+	if database.DbConn == nil {
+		log.Println("database connection is not initialized")
+		context["statusText"] = "bad"
+		context["msg"] = "Database error"
+		return c.Status(fiber.StatusInternalServerError).JSON(context)
+	}
+
+	user, err := currentUserFromContext(c, context)
+	if err != nil {
+		return err
+	}
+
+	var items []models.Item
+	result := database.DbConn.
+		Model(&models.Item{}).
+		Joins("JOIN favorites ON favorites.item_id = items.id").
+		Where("favorites.user_id = ?", user.ID).
+		Preload("Categories").
+		Order("favorites.created_at DESC").
+		Find(&items)
+	if result.Error != nil {
+		log.Println("Error fetching favorites:", result.Error)
+		context["statusText"] = "bad"
+		context["msg"] = "Database error"
+		return c.Status(fiber.StatusInternalServerError).JSON(context)
+	}
+
+	context["items"] = items
+	return c.Status(fiber.StatusOK).JSON(context)
+}
+
 func AddFavorite(c *fiber.Ctx) error {
 	context := fiber.Map{
 		"statusText": "Ok",

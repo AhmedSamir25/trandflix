@@ -9,6 +9,7 @@ import (
 
 func RegisterFavoriteRoutes(app *fiber.App) {
 	favorites := app.Group("/favorites", middleware.Authenticate)
+	favorites.Get("", favoritescontroller.GetFavorites)
 	favorites.Post("/:item_id", favoritescontroller.AddFavorite)
 	favorites.Delete("/:item_id", favoritescontroller.RemoveFavorite)
 }

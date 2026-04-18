@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="getStarted.title">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Get Started</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/get-started.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/get-started.js"></script>
+  </head>
+  <body>
+    <div class="hero-bg">
+      <img src="/assets/images/Watch-Free-Hero-2048x1152-1.webp" alt="TrendFlix Hero" />
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+    <main class="card get-started-card">
+      <h1 class="brand">TrendFlix</h1>
+      <p class="subtitle" data-i18n="getStarted.subtitle">Movies, series, games and more</p>
+      <form id="getStartedForm" class="form">
+        <label class="field">
+          <span data-i18n="common.email">Email</span>
+          <input name="email" type="email" placeholder="Enter your email" data-i18n-placeholder="getStarted.emailPlaceholder" autocomplete="email" required />
+        </label>
+        <button class="btn primary" type="submit" data-i18n="getStarted.submit">Get Started</button>
+      </form>
+    </main>
+  </body>
+</html>

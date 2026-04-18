@@ -8,6 +8,9 @@ import (
 )
 
 func RegisterCategoryRoutes(app *fiber.App) {
+	categories := app.Group("/categories")
+	categories.Get("", categoriescontroller.GetCategories)
+
 	adminCategories := app.Group("/categories", middleware.Authenticate, middleware.RequireAdmin)
 	adminCategories.Post("", categoriescontroller.CreateCategory)
 	adminCategories.Put("/:id", categoriescontroller.UpdateCategory)

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.catalogPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Catalog</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/admin-shared.js"></script>
+    <script defer src="/assets/js/admin-catalog.js"></script>
+  </head>
+  <body>
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" data-i18n="admin.navCatalog">Catalog</h1>
+          <p class="admin-subtitle" data-i18n="admin.catalogSubtitle">Browse all published items in the library.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/app.html" data-i18n="admin.backToApp">Back to app</a>
+          <button class="btn primary compact-btn" id="logoutBtn" type="button" data-i18n="admin.logout">Logout</button>
+        </div>
+      </header>
+
+      <nav class="admin-top-nav">
+        <a class="admin-nav-link" href="/pages/admin.html" data-i18n="admin.navDashboard">Dashboard</a>
+        <a class="admin-nav-link" href="/pages/admin/categories.html" data-i18n="admin.navCategories">Categories</a>
+        <a class="admin-nav-link" href="/pages/admin/create-item.html" data-i18n="admin.navCreateItem">Create Item</a>
+        <a class="admin-nav-link active" href="/pages/admin/catalog.html" data-i18n="admin.navCatalog">Catalog</a>
+      </nav>
+
+      <p id="pageError" class="notice error-notice" hidden></p>
+
+      <section class="card panel">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-kicker" data-i18n="admin.catalogKicker">Catalog</p>
+            <h2 data-i18n="admin.allItems">All items</h2>
+          </div>
+          <button class="text-btn" id="refreshItemsBtn" type="button" data-i18n="admin.refresh">Refresh</button>
+        </div>
+        <div id="catalogFilters" class="catalog-filters"></div>
+        <div id="itemList" class="item-list"></div>
+      </section>
+    </main>
+  </body>
+</html>
