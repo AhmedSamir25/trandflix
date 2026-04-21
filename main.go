@@ -14,6 +14,7 @@ func main() {
 	database.Migrate()
 	database.SeedAdmin()
 	database.SeedCategories()
+	database.SeedItems()
 
 	app := fiber.New()
 	app.Static("/upload", "./upload")
