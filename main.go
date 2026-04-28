@@ -20,6 +20,7 @@ func main() {
 	app.Static("/upload", "./upload")
 
 	routers.RegisterAuthRoutes(app)
+	routers.RegisterAdminRoutes(app)
 	routers.RegisterChatRoutes(app)
 	routers.RegisterCategoryRoutes(app)
 	routers.RegisterFavoriteRoutes(app)

@@ -86,6 +86,9 @@ function renderItemList() {
           </div>
           <div class="catalog-card__actions">
             <a class="text-btn catalog-card__action" href="/pages/admin/edit-item.html?id=${item.id}">${escapeHtml(t("admin.editItem"))}</a>
+            <button class="text-btn danger-btn catalog-card__action" type="button" data-delete-item="${item.id}">
+              ${escapeHtml(t("admin.deleteItem"))}
+            </button>
           </div>
         </article>`;
     })
@@ -104,6 +107,21 @@ async function loadItems() {
   render();
 }
 
+async function deleteItem(itemId) {
+  const item = items.find((entry) => Number(entry.id) === Number(itemId));
+  const itemName = item?.title || t("admin.thisItem");
+  if (!window.confirm(t("admin.confirmDeleteItem").replace("{name}", itemName))) return;
+
+  clearNotice("pageError");
+  await fetchJson(`/items/${itemId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  items = items.filter((entry) => Number(entry.id) !== Number(itemId));
+  render();
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
   if (!requireAdmin()) return;
 
@@ -119,6 +137,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (!btn) return;
     activeFilter = btn.dataset.filter;
     render();
+  });
+
+  document.getElementById("itemList")?.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-delete-item]");
+    if (!btn) return;
+    deleteItem(btn.dataset.deleteItem).catch(showPageError);
   });
 
   window.addEventListener("trendflix:languagechange", render);

@@ -1,123 +1,162 @@
+/* ─── TrendFlix · Auth ───────────────────────────────────────────────── */
+
+body.page-center {
+  position: relative;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+body.page-center::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url("/assets/images/Watch-Free-Hero-2048x1152-1.webp") center/cover no-repeat;
+  filter: brightness(0.42) saturate(1.08);
+}
+
+body.page-center::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(800px 480px at 80% 110%, rgba(229, 9, 20, 0.22), transparent 70%),
+    linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%);
+}
+
 .auth-card {
-  width: min(420px, 100%);
-  padding: 26px;
+  width: min(440px, 100%);
+  padding: 42px 36px 32px;
   text-align: center;
+  background: rgba(10, 10, 12, 0.78);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border: 1px solid var(--border-strong);
+  border-radius: 22px;
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .subtitle {
-  margin: 0 0 18px 0;
+  margin: 0 0 26px 0;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 14.5px;
+  letter-spacing: 0.2px;
 }
 
 .form {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   text-align: left;
 }
+html[dir="rtl"] .form { text-align: right; }
 
-html[dir="rtl"] .form {
-  text-align: right;
+.field {
+  position: relative;
 }
 
 .field span {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
 .field input {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
   border: 1px solid var(--border);
-  background: #222;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   outline: none;
+  font-size: 15px;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.password-field {
-  position: relative;
+.field input::placeholder { color: var(--dim); }
+
+.field input:hover { background: rgba(255, 255, 255, 0.06); }
+
+.field input:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 4px rgba(229, 9, 20, 0.18);
 }
+
+.password-field { position: relative; }
 
 .password-field input {
-  padding-right: 40px;
+  padding-right: 46px;
   box-sizing: border-box;
 }
 
 .password-toggle {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 12px;
+  bottom: 11px;
   background: none;
   border: none;
   color: var(--muted);
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 0;
+  border-radius: 8px;
+  transition: color 0.18s ease, background 0.18s ease;
 }
+.password-toggle:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
 
 html[dir="rtl"] .password-field input {
-  padding-right: 12px;
-  padding-left: 40px;
+  padding-right: 16px;
+  padding-left: 46px;
 }
+html[dir="rtl"] .password-toggle { right: auto; left: 12px; }
 
-html[dir="rtl"] .password-toggle {
-  right: auto;
-  left: 10px;
-}
-
-.password-toggle:hover {
-  color: var(--text);
-}
-
-.password-toggle svg {
-  width: 18px;
-  height: 18px;
-}
-
-.password-toggle .eye-closed {
-  display: none;
-}
-
-.password-toggle.showing .eye-open {
-  display: none;
-}
-
-.password-toggle.showing .eye-closed {
-  display: block;
-}
+.password-toggle svg { width: 19px; height: 19px; }
+.password-toggle .eye-closed { display: none; }
+.password-toggle.showing .eye-open { display: none; }
+.password-toggle.showing .eye-closed { display: block; }
 
 .error {
-  margin: 0;
-  padding: 10px 12px;
+  margin: 4px 0 0;
+  padding: 11px 14px;
   border-radius: 10px;
-  background: rgba(255, 75, 43, 0.12);
-  border: 1px solid rgba(255, 75, 43, 0.3);
-  color: #ffb3aa;
+  background: rgba(229, 9, 20, 0.12);
+  border: 1px solid rgba(229, 9, 20, 0.45);
+  color: #ffb3b3;
   font-size: 13px;
+  text-align: left;
+  font-weight: 600;
 }
+html[dir="rtl"] .error { text-align: right; }
 
-.hint {
-  margin: 0;
-  font-size: 12px;
-}
+.hint { margin: 0; font-size: 12px; color: var(--muted); }
 
 .switch-auth {
-  margin: 16px 0 0 0;
+  margin: 20px 0 0;
   font-size: 14px;
   color: var(--muted);
 }
 
 .switch-auth a {
-  color: var(--primary);
+  color: var(--text);
   text-decoration: none;
+  font-weight: 700;
+  margin-left: 4px;
+  transition: color 0.15s ease;
 }
+.switch-auth a:hover { color: var(--primary); text-decoration: underline; }
 
-.switch-auth a:hover {
-  text-decoration: underline;
+html[dir="rtl"] .switch-auth a { margin-left: 0; margin-right: 4px; }
+
+.auth-card .btn.primary { margin-top: 6px; padding: 14px; font-size: 15px; }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 32px 22px 26px; border-radius: 18px; }
 }

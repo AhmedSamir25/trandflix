@@ -10,7 +10,7 @@
     <script defer src="/assets/js/admin-shared.js"></script>
     <script defer src="/assets/js/admin-item-form.js"></script>
   </head>
-  <body data-item-form-mode="create">
+  <body class="admin-page" data-item-form-mode="create">
     <div class="page-tools">
       <div class="lang-menu">
         <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
@@ -34,14 +34,7 @@
         </div>
       </header>
 
-      <nav class="admin-top-nav">
-        <a class="admin-nav-link" href="/pages/admin.html" data-i18n="admin.navDashboard">Dashboard</a>
-        <a class="admin-nav-link" href="/pages/admin/categories.html" data-i18n="admin.navCategories">Categories</a>
-        <a class="admin-nav-link active" href="/pages/admin/create-item.html" data-i18n="admin.navCreateItem">Create Item</a>
-        <a class="admin-nav-link" href="/pages/admin/catalog.html" data-i18n="admin.navCatalog">Catalog</a>
-      </nav>
-
-      <p id="pageError" class="notice error-notice" hidden></p>
+<p id="pageError" class="notice error-notice" hidden></p>
 
       <section class="dashboard-grid single-col">
         <article class="card panel">

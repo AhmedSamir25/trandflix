@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="/assets/css/base.css" />
     <link rel="stylesheet" href="/assets/css/admin.css" />
     <script defer src="/assets/js/i18n.js"></script>
-    <script defer src="/assets/js/admin-shared.js"></script>
-    <script defer src="/assets/js/admin.js"></script>
+    <script defer src="/assets/js/admin-shared.js?v=stats-auth-2"></script>
+    <script defer src="/assets/js/admin.js?v=stats-auth-2"></script>
   </head>
-  <body>
+  <body class="admin-page">
     <div class="page-tools">
       <div class="lang-menu">
         <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
@@ -22,11 +22,11 @@
     </div>
 
     <main class="admin-shell">
-      <header class="admin-header">
+      <header class="admin-header admin-hero">
         <div>
           <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
-          <h1 class="brand" data-i18n="admin.titleHeading">TrendFlix Admin</h1>
-          <p class="admin-subtitle" data-i18n="admin.dashboardSubtitle">Manage catalog content — categories, items, and the full library.</p>
+          <h1 class="brand" data-i18n="admin.titleHeading">Manage catalog content</h1>
+          <p class="admin-subtitle" data-i18n="admin.dashboardSubtitle">Track your library, publish content, and control TrendFlix from one focused workspace.</p>
         </div>
         <div class="admin-actions">
           <a class="ghost-link" href="/pages/app.html" data-i18n="admin.backToApp">Back to app</a>
@@ -34,34 +34,127 @@
         </div>
       </header>
 
-      <nav class="admin-top-nav">
-        <a class="admin-nav-link active" href="/pages/admin.html" data-i18n="admin.navDashboard">Dashboard</a>
-        <a class="admin-nav-link" href="/pages/admin/categories.html" data-i18n="admin.navCategories">Categories</a>
-        <a class="admin-nav-link" href="/pages/admin/create-item.html" data-i18n="admin.navCreateItem">Create Item</a>
-        <a class="admin-nav-link" href="/pages/admin/catalog.html" data-i18n="admin.navCatalog">Catalog</a>
-      </nav>
+      <p id="pageError" class="notice error-notice" hidden></p>
 
-      <section class="admin-hub-grid">
-        <a class="hub-card card" href="/pages/admin/categories.html">
-          <div class="hub-icon">🗂️</div>
-          <h2 data-i18n="admin.navCategories">Categories</h2>
-          <p data-i18n="admin.hubCategoriesDesc">Create and manage content categories. Assign slugs and organise your library.</p>
-          <span class="hub-link" data-i18n="admin.hubCategoriesLink">Go to Categories →</span>
-        </a>
+      <section class="stats-grid" aria-label="Dashboard statistics">
+        <article class="stat-card stat-total">
+          <span class="stat-icon">▦</span>
+          <span class="stat-label" data-i18n="admin.statTotalItems">Total items</span>
+          <strong id="statTotalItems">-</strong>
+          <small data-i18n="admin.statTotalItemsHint">Published in the library</small>
+        </article>
+        <article class="stat-card stat-users">
+          <span class="stat-icon">●</span>
+          <span class="stat-label" data-i18n="admin.statUsers">Users</span>
+          <strong id="statUsers">-</strong>
+          <small data-i18n="admin.statUsersHint">Registered accounts</small>
+        </article>
+        <article class="stat-card stat-categories">
+          <span class="stat-icon">#</span>
+          <span class="stat-label" data-i18n="admin.statCategories">Categories</span>
+          <strong id="statCategoriesCard">-</strong>
+          <small data-i18n="admin.statCategoriesHint">Content sections</small>
+        </article>
+        <article class="stat-card stat-movie">
+          <span class="stat-icon">▶</span>
+          <span class="stat-label" data-i18n="admin.statMovies">Movies</span>
+          <strong id="statMovies">-</strong>
+          <small data-i18n="admin.statMoviesHint">Watchable titles</small>
+        </article>
+        <article class="stat-card stat-game">
+          <span class="stat-icon">◆</span>
+          <span class="stat-label" data-i18n="admin.statGames">Games</span>
+          <strong id="statGames">-</strong>
+          <small data-i18n="admin.statGamesHint">Playable entries</small>
+        </article>
+        <article class="stat-card stat-book">
+          <span class="stat-icon">◫</span>
+          <span class="stat-label" data-i18n="admin.statBooks">Books</span>
+          <strong id="statBooks">-</strong>
+          <small data-i18n="admin.statBooksHint">Readable content</small>
+        </article>
+      </section>
 
-        <a class="hub-card card" href="/pages/admin/create-item.html">
-          <div class="hub-icon">➕</div>
-          <h2 data-i18n="admin.hubCreateItemTitle">Create Item</h2>
-          <p data-i18n="admin.hubCreateItemDesc">Add a new movie, game, or book to the catalog with cover art and metadata.</p>
-          <span class="hub-link" data-i18n="admin.hubCreateItemLink">Create Item →</span>
-        </a>
+      <section class="admin-dashboard-grid">
+        <article class="panel control-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.controlKicker">Control center</p>
+              <h2 data-i18n="admin.controlTitle">Site management</h2>
+            </div>
+          </div>
+          <div class="control-actions">
+            <a class="control-action" href="/pages/admin/create-item.html">
+              <span class="control-icon">+</span>
+              <span>
+                <strong data-i18n="admin.hubCreateItemTitle">Create Item</strong>
+                <small data-i18n="admin.hubCreateItemDesc">Add a new movie, game, or book to the catalog with cover art and metadata.</small>
+              </span>
+            </a>
+            <a class="control-action" href="/pages/admin/catalog.html">
+              <span class="control-icon">≡</span>
+              <span>
+                <strong data-i18n="admin.navCatalog">Catalog</strong>
+                <small data-i18n="admin.hubCatalogDesc">Browse all published items in the library. Review and audit your content.</small>
+              </span>
+            </a>
+            <a class="control-action" href="/pages/admin/categories.html">
+              <span class="control-icon">#</span>
+              <span>
+                <strong data-i18n="admin.navCategories">Categories</strong>
+                <small data-i18n="admin.hubCategoriesDesc">Create and manage content categories. Assign slugs and organise your library.</small>
+              </span>
+            </a>
+          </div>
+        </article>
 
-        <a class="hub-card card" href="/pages/admin/catalog.html">
-          <div class="hub-icon">📋</div>
-          <h2 data-i18n="admin.navCatalog">Catalog</h2>
-          <p data-i18n="admin.hubCatalogDesc">Browse all published items in the library. Review and audit your content.</p>
-          <span class="hub-link" data-i18n="admin.hubCatalogLink">View Catalog →</span>
-        </a>
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.healthKicker">Library health</p>
+              <h2 data-i18n="admin.healthTitle">Content overview</h2>
+            </div>
+            <button class="text-btn" id="refreshDashboardBtn" type="button" data-i18n="admin.refresh">Refresh</button>
+          </div>
+          <div class="health-list">
+            <div class="health-row">
+              <span data-i18n="admin.statCategories">Categories</span>
+              <strong id="statCategories">-</strong>
+            </div>
+            <div class="health-row">
+              <span data-i18n="admin.statAvgRating">Average rating</span>
+              <strong id="statAvgRating">-</strong>
+            </div>
+            <div class="health-row">
+              <span data-i18n="admin.statLatestItem">Latest item</span>
+              <strong id="statLatestItem">-</strong>
+            </div>
+          </div>
+          <div class="type-bars" id="typeBars"></div>
+        </article>
+      </section>
+
+      <section class="admin-dashboard-grid dashboard-bottom-grid">
+        <article class="panel panel-wide">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.recentKicker">Recent activity</p>
+              <h2 data-i18n="admin.recentItems">Recent items</h2>
+            </div>
+            <a class="text-btn" href="/pages/admin/catalog.html" data-i18n="admin.viewAll">View all</a>
+          </div>
+          <div id="recentItemsList" class="recent-items-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.categoryKicker">Categories</p>
+              <h2 data-i18n="admin.categorySnapshot">Items by category</h2>
+            </div>
+          </div>
+          <div id="categorySnapshot" class="category-snapshot"></div>
+        </article>
       </section>
     </main>
   </body>
