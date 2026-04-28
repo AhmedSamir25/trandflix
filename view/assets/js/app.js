@@ -10,9 +10,15 @@ const SECTION_META = {
 
 const FALLBACK_IMAGE_BASE = "https://placehold.co/500x700/0f172a/f8fafc";
 const CHAT_HISTORY_LIMIT = 8;
+const BANNER_LOG_PREFIX = "[TrendFlix banner]";
+const BANNER_REQUEST_TIMEOUT_MS = 8000;
+const BANNER_ROTATION_INTERVAL_MS = 6000;
 
 let items = [];
 let categories = [];
+let homeBanners = [];
+let activeBannerIndex = 0;
+let bannerRotationTimer = 0;
 let searchQuery = "";
 let catalogStatusKey = "app.loadingCatalog";
 let currentToken = "";
@@ -125,6 +131,168 @@ function getDetailHref(itemId) {
   return `/pages/detail.html?id=${encodeURIComponent(itemId)}`;
 }
 
+function logBanner(message, details) {
+  if (typeof details === "undefined") {
+    console.log(BANNER_LOG_PREFIX, message);
+    return;
+  }
+  console.log(BANNER_LOG_PREFIX, message, details);
+}
+
+function warnBanner(message, details) {
+  if (typeof details === "undefined") {
+    console.warn(BANNER_LOG_PREFIX, message);
+    return;
+  }
+  console.warn(BANNER_LOG_PREFIX, message, details);
+}
+
+function errorBanner(message, details) {
+  if (typeof details === "undefined") {
+    console.error(BANNER_LOG_PREFIX, message);
+    return;
+  }
+  console.error(BANNER_LOG_PREFIX, message, details);
+}
+
+function normalizeBanner(banner) {
+  const title = String(banner?.title || "").trim();
+  const subtitle = String(banner?.subtitle || "").trim();
+  const imageUrl = String(banner?.image_url || "").trim();
+  if (!title || !imageUrl) {
+    warnBanner("normalize skipped invalid banner", banner);
+    return null;
+  }
+
+  const normalized = {
+    id: banner?.id ?? title,
+    title,
+    subtitle,
+    imageUrl,
+  };
+
+  logBanner("normalize success", normalized);
+  return normalized;
+}
+
+function handleBannerImageLoad(event) {
+  const img = event?.currentTarget;
+  logBanner("image loaded", {
+    src: img?.currentSrc || img?.src || "",
+    naturalWidth: img?.naturalWidth || 0,
+    naturalHeight: img?.naturalHeight || 0,
+  });
+}
+
+function handleBannerImageError(event) {
+  const img = event?.currentTarget;
+  errorBanner("image failed", {
+    src: img?.currentSrc || img?.src || "",
+  });
+  img?.classList.add("is-broken");
+}
+
+function createBannerMarkup(banner, index) {
+  return `
+    <article class="banner-slide${index === activeBannerIndex ? " active" : ""}" aria-hidden="${index === activeBannerIndex ? "false" : "true"}">
+      <img class="banner-image" src="${escapeHtml(banner.imageUrl)}" alt="${escapeHtml(banner.title)}" loading="eager" referrerpolicy="no-referrer" onload="handleBannerImageLoad(event)" onerror="handleBannerImageError(event)" />
+      <div class="banner-content">
+        <h1>${escapeHtml(banner.title)}</h1>
+        ${banner.subtitle ? `<p class="banner-description">${escapeHtml(banner.subtitle)}</p>` : ""}
+      </div>
+    </article>
+  `;
+}
+
+function createEmptyBannerMarkup() {
+  return `
+    <article class="banner-slide active" aria-hidden="false">
+      <div class="banner-content">
+        <h1>${escapeHtml(t("app.bannerFallbackTitle"))}</h1>
+        <p class="banner-description">${escapeHtml(t("app.bannerFallbackDescription"))}</p>
+      </div>
+    </article>
+  `;
+}
+
+function setBannerLoading(isLoading) {
+  const bannerHero = document.getElementById("bannerHero");
+  if (!bannerHero) return null;
+
+  bannerHero.classList.toggle("is-loading", isLoading);
+  bannerHero.setAttribute("aria-busy", isLoading ? "true" : "false");
+  return bannerHero;
+}
+
+function clearBannerRotation() {
+  if (!bannerRotationTimer) return;
+  window.clearInterval(bannerRotationTimer);
+  bannerRotationTimer = 0;
+}
+
+function showBannerSlide(index) {
+  const slides = Array.from(document.querySelectorAll("#bannerHero .banner-slide"));
+  if (!slides.length) return;
+
+  activeBannerIndex = ((index % slides.length) + slides.length) % slides.length;
+
+  slides.forEach((slide, slideIndex) => {
+    const isActive = slideIndex === activeBannerIndex;
+    slide.classList.toggle("active", isActive);
+    slide.setAttribute("aria-hidden", isActive ? "false" : "true");
+  });
+}
+
+function startBannerRotation() {
+  clearBannerRotation();
+  if (homeBanners.length < 2) return;
+
+  bannerRotationTimer = window.setInterval(() => {
+    showBannerSlide(activeBannerIndex + 1);
+  }, BANNER_ROTATION_INTERVAL_MS);
+}
+
+function renderBanners() {
+  const bannerHero = setBannerLoading(false);
+  if (!bannerHero) {
+    errorBanner("render aborted: #bannerHero not found");
+    return;
+  }
+
+  clearBannerRotation();
+
+  if (!homeBanners.length) {
+    warnBanner("render with empty banner");
+    bannerHero.innerHTML = `
+      <div class="banner-track">
+        ${createEmptyBannerMarkup()}
+      </div>
+    `;
+    return;
+  }
+
+  activeBannerIndex = Math.min(activeBannerIndex, homeBanners.length - 1);
+
+  logBanner("render start", {
+    count: homeBanners.length,
+    activeBannerIndex,
+  });
+
+  bannerHero.innerHTML = `
+    <div class="banner-track">
+      ${homeBanners.map((banner, index) => createBannerMarkup(banner, index)).join("")}
+    </div>
+  `;
+
+  showBannerSlide(activeBannerIndex);
+  startBannerRotation();
+
+  logBanner("render done", {
+    htmlLength: bannerHero.innerHTML.length,
+    count: homeBanners.length,
+  });
+}
+
 function card(item) {
   const favoriteLabel = t("app.toggleFavorite");
   const safeName = escapeHtml(item.title || "");
@@ -219,24 +387,37 @@ function renderCatalog() {
   catalogSections.innerHTML = availableTypes.map((type) => createSection(type)).join("");
 }
 
-async function fetchJson(url, options = {}, token = "") {
+async function fetchJson(url, options = {}, token = "", timeoutMs = 20000) {
   const headers = {
     Accept: "application/json",
     ...(options.headers || {}),
   };
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data?.msg || `Request failed: ${response.status}`);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data?.msg || `Request failed: ${response.status}`);
+    }
+
+    return data;
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("Request timed out");
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
   }
-
-  return data;
 }
 
 async function loadCatalog() {
@@ -248,6 +429,37 @@ async function loadCatalog() {
   categories = Array.isArray(categoriesResponse?.categories) ? categoriesResponse.categories : [];
 
   renderCatalog();
+}
+
+async function loadBanners() {
+  logBanner("load start");
+  setBannerLoading(true);
+
+  try {
+    const response = await fetchJson("/banners", {}, "", BANNER_REQUEST_TIMEOUT_MS);
+    logBanner("raw response", response);
+
+    homeBanners = (Array.isArray(response?.banners) ? response.banners : [])
+      .map(normalizeBanner)
+      .filter(Boolean);
+    activeBannerIndex = 0;
+
+    if (!homeBanners.length) {
+      warnBanner("no valid active banner found in response");
+    } else {
+      logBanner("selected banners", {
+        count: homeBanners.length,
+        titles: homeBanners.map((banner) => banner.title),
+      });
+    }
+  } catch (error) {
+    errorBanner("load failed", {
+      message: error?.message || String(error),
+    });
+    homeBanners = [];
+  } finally {
+    renderBanners();
+  }
 }
 
 async function loadFavoriteItemIds(token) {
@@ -360,6 +572,8 @@ function updateSearch(value) {
 }
 
 function handleLanguageChange() {
+  renderBanners();
+
   if (catalogStatusKey) {
     setCatalogStatus(catalogStatusKey);
     return;
@@ -380,11 +594,23 @@ function logout() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
+  logBanner("DOMContentLoaded fired");
+
   const token = requireAuth();
-  if (!token) return;
+  if (!token) {
+    warnBanner("auth token missing, redirecting to login");
+    return;
+  }
   currentToken = token;
 
+  logBanner("auth token found", {
+    tokenLength: token.length,
+    hasBannerMount: Boolean(document.getElementById("bannerHero")),
+  });
+
   syncAdminNavLink();
+
+  loadBanners();
 
   try {
     await loadCatalog();

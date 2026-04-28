@@ -189,6 +189,7 @@ const ADMIN_DRAWER_LINKS = [
   { href: "/pages/admin/categories.html",     icon: "🗂️", labelKey: "admin.navCategories",  fallback: "Categories" },
   { href: "/pages/admin/create-item.html",    icon: "➕", labelKey: "admin.navCreateItem",  fallback: "Create Item" },
   { href: "/pages/admin/catalog.html",        icon: "📋", labelKey: "admin.navCatalog",     fallback: "All Items" },
+  { href: "/pages/admin/banners.html",        icon: "🖼️", labelKey: "admin.navBanners",     fallback: "Banners" },
 ];
 
 function injectAdminDrawer() {

@@ -46,6 +46,17 @@ var defaultCategories = []models.Category{
 	{Name: "Western", Slug: "western"},
 }
 
+var defaultBanners = []models.Banner{
+	{
+		Title:     "Discover Entertainment",
+		Subtitle:  "Movies, games, and books picked for you every time you open TrendFlix.",
+		ImageURL:  "/assets/images/default-banner.svg",
+		LinkURL:   "",
+		IsActive:  true,
+		SortOrder: 0,
+	},
+}
+
 func SeedAdmin() {
 	if DbConn == nil {
 		panic("database is not connected")
@@ -142,4 +153,26 @@ func SeedCategories() {
 	}
 
 	log.Printf("category seed: ensured %d default categories", len(defaultCategories))
+}
+
+func SeedBanners() {
+	if DbConn == nil {
+		panic("database is not connected")
+	}
+
+	var count int64
+	if err := DbConn.Model(&models.Banner{}).Count(&count).Error; err != nil {
+		panic(fmt.Sprintf("banner seed count failed: %v", err))
+	}
+
+	if count > 0 {
+		log.Printf("banner seed: skipped because %d banners already exist", count)
+		return
+	}
+
+	if err := DbConn.Create(&defaultBanners).Error; err != nil {
+		panic(fmt.Sprintf("banner seed create failed: %v", err))
+	}
+
+	log.Printf("banner seed: created %d default banners", len(defaultBanners))
 }

@@ -1,69 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-i18n-title="app.title">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TrendFlix · Home</title>
-    <link rel="stylesheet" href="/assets/css/base.css" />
-    <link rel="stylesheet" href="/assets/css/app.css" />
-    <script defer src="/assets/js/i18n.js"></script>
-    <script defer src="/assets/js/app.js"></script>
-  </head>
-  <body>
-    <div class="sidebar-overlay" id="overlay" aria-hidden="true"></div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TrendFlix · Home</title>
+        <link rel="stylesheet" href="/assets/css/base.css" />
+        <link rel="stylesheet" href="/assets/css/app.css" />
+        <script defer src="/assets/js/i18n.js"></script>
+        <script defer src="/assets/js/app.js"></script>
+    </head>
+    <body>
+        <div class="sidebar-overlay" id="overlay" aria-hidden="true"></div>
 
-    <aside class="sidebar" id="sidebar" data-i18n-aria-label="app.sidebarNavigation">
-      <a href="#" data-nav="home">🏠 <span data-i18n="app.home">Home</span></a>
-      <a href="#" data-nav="library">📚 <span data-i18n="app.library">Library</span></a>
-      <a href="#" data-nav="watch-later">🕒 <span data-i18n="app.watchLater">Watch Later</span></a>
-      <a href="/pages/favorites.html" data-nav="favorites">❤️ <span data-i18n="app.favorites">Favorites</span></a>
-      <a href="#" data-nav="settings">⚙️ <span data-i18n="app.settings">Settings</span></a>
-      <a href="/pages/admin.html" id="adminNavLink" hidden>🛠 <span data-i18n="app.adminDashboard">Admin Dashboard</span></a>
-      <button class="link danger" id="logoutBtn" type="button">🚪 <span data-i18n="app.logout">Logout</span></button>
-    </aside>
+        <aside
+            class="sidebar"
+            id="sidebar"
+            data-i18n-aria-label="app.sidebarNavigation"
+        >
+            <a href="#" data-nav="home"
+                >🏠 <span data-i18n="app.home">Home</span></a
+            >
+            <a href="#" data-nav="library"
+                >📚 <span data-i18n="app.library">Library</span></a
+            >
+            <a href="#" data-nav="watch-later"
+                >🕒 <span data-i18n="app.watchLater">Watch Later</span></a
+            >
+            <a href="/pages/favorites.html" data-nav="favorites"
+                >❤️ <span data-i18n="app.favorites">Favorites</span></a
+            >
+            <a href="#" data-nav="settings"
+                >⚙️ <span data-i18n="app.settings">Settings</span></a
+            >
+            <a href="/pages/admin.html" id="adminNavLink" hidden
+                >🛠
+                <span data-i18n="app.adminDashboard">Admin Dashboard</span></a
+            >
+            <button class="link danger" id="logoutBtn" type="button">
+                🚪 <span data-i18n="app.logout">Logout</span>
+            </button>
+        </aside>
 
-    <nav class="topnav">
-      <div class="nav-left">
-        <button class="icon-btn" id="menuBtn" type="button" data-i18n-aria-label="app.openMenu">☰</button>
-        <h3 class="nav-title">TrendFlix</h3>
-      </div>
-      <div class="nav-actions">
-        <input id="searchInput" placeholder="Search..." data-i18n-placeholder="common.searchPlaceholder" autocomplete="off" />
-        <div class="lang-menu">
-          <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
-          <div class="lang-menu-list" data-lang-menu>
-            <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
-            <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
-          </div>
-        </div>
-      </div>
-    </nav>
+        <nav class="topnav">
+            <div class="nav-left">
+                <button
+                    class="icon-btn"
+                    id="menuBtn"
+                    type="button"
+                    data-i18n-aria-label="app.openMenu"
+                >
+                    ☰
+                </button>
+                <h3 class="nav-title">TrendFlix</h3>
+            </div>
+            <div class="nav-actions">
+                <input
+                    id="searchInput"
+                    placeholder="Search..."
+                    data-i18n-placeholder="common.searchPlaceholder"
+                    autocomplete="off"
+                />
+                <div class="lang-menu">
+                    <button
+                        class="lang-trigger"
+                        type="button"
+                        data-lang-trigger
+                        data-i18n-aria-label="common.language"
+                        aria-expanded="false"
+                    >
+                        🌐
+                    </button>
+                    <div class="lang-menu-list" data-lang-menu>
+                        <button
+                            class="lang-option"
+                            type="button"
+                            data-set-lang="en"
+                            data-i18n="common.english"
+                        >
+                            English
+                        </button>
+                        <button
+                            class="lang-option"
+                            type="button"
+                            data-set-lang="ar"
+                            data-i18n="common.arabic"
+                        >
+                            Arabic
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
 
-  
-    <header class="hero">
-      <h2 data-i18n="app.discoverEntertainment">Discover Entertainment</h2>
-    </header>
+        <section
+            class="banner-hero"
+            id="bannerHero"
+            aria-label="Featured banners"
+            aria-busy="false"
+        >
+            <div class="banner-track">
+                <article class="banner-slide active" aria-hidden="false">
+                    <div class="banner-content">
+                        <h1 data-i18n="app.bannerFallbackTitle">
+                            Featured stories are on the way
+                        </h1>
+                        <p
+                            class="banner-description"
+                            data-i18n="app.bannerFallbackDescription"
+                        >
+                            Add an active banner from the admin dashboard to
+                            spotlight movies, games, and books here.
+                        </p>
+                    </div>
+                </article>
+            </div>
+        </section>
 
-    <main id="catalogSections" class="catalog-sections" aria-live="polite">
-      <p class="catalog-status" id="catalogStatus" data-i18n="app.loadingCatalog">Loading catalog...</p>
-    </main>
+        <main id="catalogSections" class="catalog-sections" aria-live="polite">
+            <p
+                class="catalog-status"
+                id="catalogStatus"
+                data-i18n="app.loadingCatalog"
+            >
+                Loading catalog...
+            </p>
+        </main>
 
-    <button class="ai-icon" id="aiToggle" type="button" data-i18n-aria-label="app.openAiChat">🤖</button>
-    <section class="chat-box" id="chatBox" data-i18n-aria-label="app.aiChat" aria-hidden="true">
-      <header class="chat-header">
-        <div class="chat-branding">
-          <strong class="chat-title" data-i18n="app.trendAi">TrendFlix</strong>
-          <span class="chat-subtitle" data-i18n="app.chatScope">Movies, games, and books only</span>
-        </div>
-        <button class="icon-btn" id="chatClose" type="button" data-i18n-aria-label="app.closeChat">✕</button>
-      </header>
-      <div id="chatLogs" class="chat-logs">
-        <div class="msg bot-msg" data-i18n="app.chatWelcome">Welcome to TrendFlix. I only answer questions about movies, games, and books.</div>
-      </div>
-      <form class="chat-input-area" id="chatForm">
-        <input type="text" id="userInput" placeholder="Ask about movies, games, or books..." data-i18n-placeholder="app.askAnything" autocomplete="off" maxlength="500" />
-        <button id="chatSubmit" type="submit" data-i18n-aria-label="common.sendMessage">➤</button>
-      </form>
-    </section>
-  </body>
+        <button
+            class="ai-icon"
+            id="aiToggle"
+            type="button"
+            data-i18n-aria-label="app.openAiChat"
+        >
+            🤖
+        </button>
+        <section
+            class="chat-box"
+            id="chatBox"
+            data-i18n-aria-label="app.aiChat"
+            aria-hidden="true"
+        >
+            <header class="chat-header">
+                <div class="chat-branding">
+                    <strong class="chat-title" data-i18n="app.trendAi"
+                        >TrendFlix</strong
+                    >
+                    <span class="chat-subtitle" data-i18n="app.chatScope"
+                        >Movies, games, and books only</span
+                    >
+                </div>
+                <button
+                    class="icon-btn"
+                    id="chatClose"
+                    type="button"
+                    data-i18n-aria-label="app.closeChat"
+                >
+                    ✕
+                </button>
+            </header>
+            <div id="chatLogs" class="chat-logs">
+                <div class="msg bot-msg" data-i18n="app.chatWelcome">
+                    Welcome to TrendFlix. I only answer questions about movies,
+                    games, and books.
+                </div>
+            </div>
+            <form class="chat-input-area" id="chatForm">
+                <input
+                    type="text"
+                    id="userInput"
+                    placeholder="Ask about movies, games, or books..."
+                    data-i18n-placeholder="app.askAnything"
+                    autocomplete="off"
+                    maxlength="500"
+                />
+                <button
+                    id="chatSubmit"
+                    type="submit"
+                    data-i18n-aria-label="common.sendMessage"
+                >
+                    ➤
+                </button>
+            </form>
+        </section>
+    </body>
 </html>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">TrendFlix featured banner</title>
+  <desc id="desc">A stylized TrendFlix banner for movies, games, and books.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#08080a" />
+      <stop offset="55%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#1f2937" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="100%" stop-color="#dc2626" />
+    </linearGradient>
+    <linearGradient id="panelA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#7c2d12" />
+    </linearGradient>
+    <linearGradient id="panelB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="panelC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a78bfa" />
+      <stop offset="100%" stop-color="#5b21b6" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="20%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)" />
+  <rect width="1600" height="900" fill="url(#glow)" />
+
+  <circle cx="1300" cy="140" r="180" fill="#ef4444" fill-opacity="0.18" />
+  <circle cx="1440" cy="260" r="240" fill="#38bdf8" fill-opacity="0.12" />
+
+  <g opacity="0.96">
+    <rect x="970" y="170" width="160" height="470" rx="26" fill="url(#panelA)" transform="rotate(8 970 170)" />
+    <rect x="1110" y="110" width="180" height="560" rx="28" fill="url(#panelB)" transform="rotate(-6 1110 110)" />
+    <rect x="1280" y="200" width="160" height="450" rx="26" fill="url(#panelC)" transform="rotate(10 1280 200)" />
+  </g>
+
+  <rect x="120" y="180" width="118" height="10" rx="5" fill="url(#accent)" />
+  <text x="120" y="250" fill="#f8fafc" font-size="82" font-weight="800" font-family="Arial, Helvetica, sans-serif">
+    Discover Entertainment
+  </text>
+  <text x="120" y="320" fill="#d1d5db" font-size="34" font-weight="500" font-family="Arial, Helvetica, sans-serif">
+    Movies, games, and books curated for every mood.
+  </text>
+
+  <g transform="translate(120 420)">
+    <rect width="190" height="56" rx="28" fill="url(#accent)" />
+    <text x="95" y="37" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="700" font-family="Arial, Helvetica, sans-serif">
+      TrendFlix Picks
+    </text>
+  </g>
+
+  <g fill="#f8fafc" fill-opacity="0.82" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">
+    <text x="120" y="540">FEATURED</text>
+    <text x="250" y="540">MOVIES</text>
+    <text x="360" y="540">GAMES</text>
+    <text x="465" y="540">BOOKS</text>
+  </g>
+</svg>

@@ -15,12 +15,14 @@ func main() {
 	database.SeedAdmin()
 	database.SeedCategories()
 	database.SeedItems()
+	database.SeedBanners()
 
 	app := fiber.New()
 	app.Static("/upload", "./upload")
 
 	routers.RegisterAuthRoutes(app)
 	routers.RegisterAdminRoutes(app)
+	routers.RegisterBannerRoutes(app)
 	routers.RegisterChatRoutes(app)
 	routers.RegisterCategoryRoutes(app)
 	routers.RegisterFavoriteRoutes(app)

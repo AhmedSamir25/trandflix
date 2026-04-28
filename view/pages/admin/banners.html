@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.bannersPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Banners</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/admin-shared.js"></script>
+    <script defer src="/assets/js/admin-banners.js"></script>
+  </head>
+  <body class="admin-page">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" data-i18n="admin.navBanners">Banners</h1>
+          <p class="admin-subtitle" data-i18n="admin.bannersSubtitle">Manage hero banner slides shown on the home page.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/app.html" data-i18n="admin.backToApp">Back to app</a>
+          <button class="btn primary compact-btn" id="logoutBtn" type="button" data-i18n="admin.logout">Logout</button>
+        </div>
+      </header>
+
+      <p id="pageError" class="notice error-notice" hidden></p>
+
+      <section class="dashboard-grid single-col">
+        <article class="card panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.bannerKicker">Banners</p>
+              <h2 id="bannerFormTitle" data-i18n="admin.bannerCreateTitle">Add a banner</h2>
+            </div>
+            <button class="text-btn" id="refreshBannersBtn" type="button" data-i18n="admin.refresh">Refresh</button>
+          </div>
+
+          <form id="bannerForm" class="form-stack">
+            <label class="field">
+              <span data-i18n="admin.bannerTitle">Title</span>
+              <input id="bannerTitle" name="title" type="text" required />
+            </label>
+            <label class="field">
+              <span data-i18n="admin.bannerSubtitle">Subtitle</span>
+              <input id="bannerSubtitle" name="subtitle" type="text" />
+            </label>
+            <label class="field">
+              <span data-i18n="admin.bannerImageUrl">Image URL</span>
+              <input id="bannerImageUrl" name="image_url" type="url" required />
+            </label>
+            <label class="field">
+              <span data-i18n="admin.bannerLinkUrl">Link URL (optional)</span>
+              <input id="bannerLinkUrl" name="link_url" type="text" />
+            </label>
+            <label class="field">
+              <span data-i18n="admin.bannerSortOrder">Sort order</span>
+              <input id="bannerSortOrder" name="sort_order" type="number" value="0" min="0" />
+            </label>
+            <label class="field field-inline">
+              <input id="bannerIsActive" name="is_active" type="checkbox" checked />
+              <span data-i18n="admin.bannerIsActive">Active (visible on home page)</span>
+            </label>
+            <div class="form-row">
+              <button class="btn primary" id="saveBannerBtn" type="submit" data-i18n="admin.bannerCreate">Add banner</button>
+              <button class="btn ghost" id="cancelEditBtn" type="button" hidden data-i18n="admin.cancel">Cancel</button>
+            </div>
+            <p id="bannerStatus" class="notice" hidden></p>
+          </form>
+
+          <div class="list-block" style="margin-top: 24px;">
+            <div class="list-header">
+              <h3 data-i18n="admin.currentBanners">Current banners</h3>
+            </div>
+            <div id="bannerList"></div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
