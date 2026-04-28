@@ -20,11 +20,11 @@
             <a href="#" data-nav="home"
                 >🏠 <span data-i18n="app.home">Home</span></a
             >
-            <a href="#" data-nav="library"
-                >📚 <span data-i18n="app.library">Library</span></a
-            >
-            <a href="#" data-nav="watch-later"
+            <a href="/pages/watch-later.html" data-nav="watch-later"
                 >🕒 <span data-i18n="app.watchLater">Watch Later</span></a
+            >
+            <a href="/pages/lists.html" data-nav="lists"
+                >📋 <span data-i18n="app.myLists">My Lists</span></a
             >
             <a href="/pages/favorites.html" data-nav="favorites"
                 >❤️ <span data-i18n="app.favorites">Favorites</span></a
@@ -125,6 +125,66 @@
                 Loading catalog...
             </p>
         </main>
+
+        <footer class="site-footer">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3 class="footer-logo">TrendFlix</h3>
+                    <p class="footer-tagline" data-i18n="app.footerTagline">
+                        Your ultimate destination for movies, games, and books.
+                    </p>
+                    <div class="footer-socials">
+                        <a href="#" aria-label="Twitter" class="social-icon" data-i18n-aria-label="app.socialTwitter">𝕏</a>
+                        <a href="#" aria-label="Instagram" class="social-icon" data-i18n-aria-label="app.socialInstagram">📷</a>
+                        <a href="#" aria-label="YouTube" class="social-icon" data-i18n-aria-label="app.socialYoutube">▶</a>
+                        <a href="#" aria-label="Discord" class="social-icon" data-i18n-aria-label="app.socialDiscord">💬</a>
+                    </div>
+                </div>
+
+                <div class="footer-nav-group">
+                    <h4 class="footer-heading" data-i18n="app.footerExplore">Explore</h4>
+                    <ul class="footer-nav">
+                        <li><a href="#" data-nav="home" data-i18n="app.home">Home</a></li>
+                        <li><a href="/pages/watch-later.html" data-nav="watch-later" data-i18n="app.watchLater">Watch Later</a></li>
+                        <li><a href="/pages/lists.html" data-i18n="app.myLists">My Lists</a></li>
+                        <li><a href="/pages/favorites.html" data-i18n="app.favorites">Favorites</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-nav-group">
+                    <h4 class="footer-heading" data-i18n="app.footerCompany">Company</h4>
+                    <ul class="footer-nav">
+                        <li><a href="#" data-i18n="app.footerAbout">About Us</a></li>
+                        <li><a href="#" data-i18n="app.footerCareers">Careers</a></li>
+                        <li><a href="#" data-i18n="app.footerBlog">Blog</a></li>
+                        <li><a href="#" data-i18n="app.footerPress">Press</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-nav-group">
+                    <h4 class="footer-heading" data-i18n="app.footerSupport">Support</h4>
+                    <ul class="footer-nav">
+                        <li><a href="#" data-i18n="app.footerHelp">Help Center</a></li>
+                        <li><a href="#" data-i18n="app.footerPrivacy">Privacy Policy</a></li>
+                        <li><a href="#" data-i18n="app.footerTerms">Terms of Service</a></li>
+                        <li><a href="#" data-i18n="app.footerContact">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <p class="footer-copyright">
+                    &copy; 2026 TrendFlix. <span data-i18n="app.footerRights">All rights reserved.</span>
+                </p>
+                <div class="footer-locale">
+                    <button class="locale-btn" type="button">
+                        🌐 <span data-i18n="common.language">Language</span>
+                    </button>
+                </div>
+            </div>
+        </footer>
 
         <button
             class="ai-icon"

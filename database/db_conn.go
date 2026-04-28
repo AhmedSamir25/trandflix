@@ -76,6 +76,9 @@ func Migrate() {
 		&models.Favorite{},
 		&models.Review{},
 		&models.Banner{},
+		&models.WatchLater{},
+		&models.UserList{},
+		&models.UserListItem{},
 	)
 	if err != nil {
 		panic(fmt.Sprintf("migration failed: %v", err))

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="watchLater.pageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Watch Later</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/lists.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/watch-later.js"></script>
+  </head>
+  <body>
+    <div class="lists-shell">
+      <nav class="lists-topbar">
+        <a class="back-link" href="/pages/app.html">← <span data-i18n="watchLater.backToHome">Back to Home</span></a>
+        <span class="lists-brand">TrendFlix</span>
+        <div class="lang-menu">
+          <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+          <div class="lang-menu-list" data-lang-menu>
+            <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+            <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+          </div>
+        </div>
+      </nav>
+
+      <header class="lists-hero">
+        <p class="lists-kicker" data-i18n="watchLater.kicker">Your queue</p>
+        <h1 data-i18n="watchLater.heading">Watch Later</h1>
+        <p class="lists-subtitle" data-i18n="watchLater.subtitle">Movies, games, and books you want to get to soon.</p>
+      </header>
+
+      <main>
+        <div class="lists-status" id="listsStatus" data-i18n="watchLater.loading">Loading watch later...</div>
+        <section class="lists-grid" id="listsGrid" hidden></section>
+      </main>
+    </div>
+  </body>
+</html>

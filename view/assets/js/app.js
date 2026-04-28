@@ -360,7 +360,11 @@ function createSection(type) {
       <div class="cat-row" data-cat-row="${type}">
         ${createCategoryChips(type)}
       </div>
-      <div class="row">${content}</div>
+      <div class="row-wrapper">
+        <button class="row-arrow row-arrow-left" type="button" aria-label="Scroll left">◀</button>
+        <div class="row">${content}</div>
+        <button class="row-arrow row-arrow-right" type="button" aria-label="Scroll right">▶</button>
+      </div>
     </section>
   `;
 }
@@ -569,6 +573,7 @@ async function requestTrendFlixReply(message) {
 function updateSearch(value) {
   searchQuery = value;
   renderCatalog();
+  initRowArrows();
 }
 
 function handleLanguageChange() {
@@ -580,12 +585,45 @@ function handleLanguageChange() {
   }
 
   renderCatalog();
+  initRowArrows();
 }
 
 function openCardDetail(cardEl) {
   const detailUrl = cardEl?.getAttribute("data-detail-url");
   if (!detailUrl) return;
   window.location.href = detailUrl;
+}
+
+function initRowArrows() {
+  document.querySelectorAll(".row-wrapper").forEach((wrapper) => {
+    const row = wrapper.querySelector(".row");
+    const leftArrow = wrapper.querySelector(".row-arrow-left");
+    const rightArrow = wrapper.querySelector(".row-arrow-right");
+    if (!row || !leftArrow || !rightArrow) return;
+
+    const scrollAmount = 440;
+
+    function updateArrows() {
+      const atStart = row.scrollLeft <= 2;
+      const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+      leftArrow.classList.toggle("visible", !atStart);
+      rightArrow.classList.toggle("visible", !atEnd);
+    }
+
+    leftArrow.addEventListener("click", () => {
+      row.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    });
+
+    rightArrow.addEventListener("click", () => {
+      row.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    });
+
+    row.addEventListener("scroll", updateArrows);
+    new MutationObserver(updateArrows).observe(row, { childList: true, subtree: true });
+    window.addEventListener("resize", updateArrows);
+
+    updateArrows();
+  });
 }
 
 function logout() {
@@ -622,6 +660,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadFavoriteItemIds(token);
     renderCatalog();
+    initRowArrows();
   } catch (error) {
     console.error("Failed to load favorites", error);
   }
@@ -640,6 +679,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       if (type) {
         activeCategoryByType[type] = categoryId;
         renderCatalog();
+        initRowArrows();
       }
       return;
     }
@@ -649,6 +689,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
       e.stopPropagation();
       await toggleFavorite(fav);
+      return;
+    }
+
+    const navLink = e.target.closest?.("[data-nav='watch-later']");
+    if (navLink) {
+      e.preventDefault();
+      window.location.href = "/pages/watch-later.html";
       return;
     }
 

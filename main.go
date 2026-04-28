@@ -30,6 +30,8 @@ func main() {
 	routers.RegisterReviewRoutes(app)
 	routers.RegisterUploadRoutes(app)
 	routers.RegisterViewRoutes(app)
+	routers.RegisterWatchLaterRoutes(app)
+	routers.RegisterListRoutes(app)
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {

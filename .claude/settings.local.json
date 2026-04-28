@@ -1,10 +1,14 @@
 {
-  "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true
-  },
   "permissions": {
     "allow": [
-      "Bash(go build *)"
+      "Bash(go build *)",
+      "Bash(pip install *)",
+      "Bash(fc-list)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 *)"
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
   }
 }

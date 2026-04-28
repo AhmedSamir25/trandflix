@@ -171,6 +171,12 @@ function buildPage(item, reviews) {
             <button class="action-fav" id="favBtn" type="button" data-item-id="${item.id}">
               ❤ <span id="favBtnLabel">${escapeHtml(t("detail.addFavorite"))}</span>
             </button>
+            <button class="action-save" id="watchLaterBtn" type="button" data-item-id="${item.id}">
+              🕒 <span id="watchLaterBtnLabel">${escapeHtml(t("detail.addWatchLater"))}</span>
+            </button>
+            <button class="action-save" id="saveToListBtn" type="button">
+              📋 <span>${escapeHtml(t("detail.saveToList"))}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -189,6 +195,21 @@ function buildPage(item, reviews) {
           <h2 class="section-title">${escapeHtml(t("detail.reviews"))}</h2>
           <div class="reviews-grid">${reviewsHtml}</div>
         </section>
+      </div>
+
+      <div class="save-to-list-modal" id="saveToListModal" hidden>
+        <div class="save-to-list-backdrop" id="saveToListBackdrop"></div>
+        <div class="save-to-list-content">
+          <div class="save-to-list-header">
+            <h3>${escapeHtml(t("detail.saveToList"))}</h3>
+            <button class="save-to-list-close" id="saveToListClose" type="button">✕</button>
+          </div>
+          <form class="create-list-inline" id="createListInline">
+            <input type="text" id="newListName" placeholder="${escapeHtml(t("lists.createPlaceholder"))}" required maxlength="100" />
+            <button type="submit" id="createListInlineBtn">${escapeHtml(t("lists.createBtn"))}</button>
+          </form>
+          <div class="save-to-list-items" id="saveToListItems"></div>
+        </div>
       </div>
 
     </div>
@@ -228,17 +249,86 @@ function attachHandlers(item, reviews, token) {
         const label = document.getElementById("favBtnLabel");
         if (label) label.textContent = t(isActive ? "detail.addFavorite" : "detail.removeFavorite");
       } catch {
-        // silently ignore
       } finally {
         favBtn.disabled = false;
       }
     });
   }
+
+  const wlBtn = document.getElementById("watchLaterBtn");
+  if (wlBtn) {
+    wlBtn.addEventListener("click", async () => {
+      const isActive = wlBtn.classList.contains("active");
+      const id = wlBtn.getAttribute("data-item-id");
+      if (!id) return;
+
+      wlBtn.disabled = true;
+      try {
+        const method = isActive ? "DELETE" : "POST";
+        await fetch(`/watch-later/${id}`, {
+          method,
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+        });
+        wlBtn.classList.toggle("active", !isActive);
+        const label = document.getElementById("watchLaterBtnLabel");
+        if (label) label.textContent = t(isActive ? "detail.addWatchLater" : "detail.removeWatchLater");
+        if (isActive) watchLaterItemIds.delete(id);
+        else watchLaterItemIds.add(id);
+      } catch {
+      } finally {
+        wlBtn.disabled = false;
+      }
+    });
+  }
+
+  const saveToListBtn = document.getElementById("saveToListBtn");
+  if (saveToListBtn) {
+    saveToListBtn.addEventListener("click", () => {
+      openSaveToListModal(token);
+    });
+  }
+
+  document.getElementById("saveToListClose")?.addEventListener("click", closeSaveToListModal);
+  document.getElementById("saveToListBackdrop")?.addEventListener("click", closeSaveToListModal);
+
+  document.getElementById("createListInline")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const input = document.getElementById("newListName");
+    const name = (input?.value || "").trim();
+    if (!name) return;
+
+    const btn = document.getElementById("createListInlineBtn");
+    btn.disabled = true;
+    try {
+      const res = await fetch("/lists", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.list) {
+        userLists.unshift(data.list);
+        listItemIds[data.list.id] = new Set();
+        renderSaveToListItems(token, item.id);
+        if (input) input.value = "";
+      }
+    } catch {
+    } finally {
+      btn.disabled = false;
+    }
+  });
 }
 
 let currentItem = null;
 let currentReviews = [];
 let currentToken = null;
+let watchLaterItemIds = new Set();
+let userLists = [];
+let listItemIds = {};
 
 function rerender() {
   if (!currentItem) return;
@@ -247,6 +337,120 @@ function rerender() {
   root.innerHTML = buildPage(currentItem, currentReviews);
   window.TrendFlixI18n?.translatePage();
   attachHandlers(currentItem, currentReviews, currentToken);
+  syncWatchLaterState();
+  syncSaveToListStates();
+}
+
+function syncWatchLaterState() {
+  const wlBtn = document.getElementById("watchLaterBtn");
+  const label = document.getElementById("watchLaterBtnLabel");
+  if (!wlBtn) return;
+  const itemId = String(wlBtn.getAttribute("data-item-id") || "");
+  const isActive = watchLaterItemIds.has(itemId);
+  wlBtn.classList.toggle("active", isActive);
+  if (label) label.textContent = t(isActive ? "detail.removeWatchLater" : "detail.addWatchLater");
+}
+
+function syncSaveToListStates() {
+  userLists.forEach((list) => {
+    const itemIds = listItemIds[list.id] || new Set();
+    if (itemIds.has(String(currentItem?.id || ""))) {
+      const btn = document.getElementById(`listToggle-${list.id}`);
+      if (btn) btn.classList.add("active");
+    }
+  });
+}
+
+function openSaveToListModal(token) {
+  const modal = document.getElementById("saveToListModal");
+  if (modal) {
+    modal.hidden = false;
+    renderSaveToListItems(token, currentItem?.id);
+  }
+}
+
+function closeSaveToListModal() {
+  const modal = document.getElementById("saveToListModal");
+  if (modal) modal.hidden = true;
+}
+
+function renderSaveToListItems(token, itemId) {
+  const container = document.getElementById("saveToListItems");
+  if (!container || !itemId) return;
+
+  if (!userLists.length) {
+    container.innerHTML = `<p class="save-to-list-empty">${escapeHtml(t("lists.noListsYet"))}</p>`;
+    return;
+  }
+
+  container.innerHTML = userLists.map((list) => {
+    const itemIds = listItemIds[list.id] || new Set();
+    const isActive = itemIds.has(String(itemId));
+    const name = escapeHtml(list.name || "");
+    const count = itemIds.size;
+
+    return `
+      <div class="save-to-list-row" data-list-id="${list.id}">
+        <button class="save-to-list-toggle ${isActive ? "active" : ""}" id="listToggle-${list.id}" type="button" data-list-id="${list.id}">
+          ${isActive ? "✓" : "○"}
+        </button>
+        <div class="save-to-list-name">
+          <span>${name}</span>
+          <span class="save-to-list-count">(${count})</span>
+        </div>
+        <button class="save-to-list-delete" type="button" data-list-id="${list.id}">🗑</button>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll(".save-to-list-toggle").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const listId = btn.getAttribute("data-list-id");
+      if (!listId) return;
+      btn.disabled = true;
+      try {
+        const itemIds = listItemIds[listId] || new Set();
+        const isAdded = itemIds.has(String(itemId));
+        const method = isAdded ? "DELETE" : "POST";
+        await fetch(`/lists/${listId}/items/${itemId}`, {
+          method,
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+        });
+        if (isAdded) {
+          itemIds.delete(String(itemId));
+        } else {
+          itemIds.add(String(itemId));
+        }
+        listItemIds[listId] = itemIds;
+        btn.classList.toggle("active", !isAdded);
+        btn.innerHTML = isAdded ? "○" : "✓";
+        const countEl = btn.closest(".save-to-list-row")?.querySelector(".save-to-list-count");
+        if (countEl) countEl.textContent = `(${itemIds.size})`;
+      } catch {
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+  container.querySelectorAll(".save-to-list-delete").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const listId = btn.getAttribute("data-list-id");
+      if (!listId) return;
+      btn.disabled = true;
+      try {
+        await fetch(`/lists/${listId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+        });
+        userLists = userLists.filter((l) => String(l.id) !== listId);
+        delete listItemIds[listId];
+        renderSaveToListItems(token, itemId);
+      } catch {
+        btn.disabled = false;
+      }
+    });
+  });
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -286,6 +490,25 @@ window.addEventListener("DOMContentLoaded", async () => {
     root.innerHTML = buildPage(item, currentReviews);
     window.TrendFlixI18n?.translatePage();
     attachHandlers(item, currentReviews, token);
+
+    try {
+      const [wlRes, listsRes] = await Promise.all([
+        fetchJson("/watch-later", token).catch(() => ({ items: [] })),
+        fetchJson("/lists", token).catch(() => ({ lists: [] })),
+      ]);
+
+      watchLaterItemIds = new Set(
+        (Array.isArray(wlRes?.items) ? wlRes.items : []).map((i) => String(i.id)),
+      );
+      userLists = Array.isArray(listsRes?.lists) ? listsRes.lists : [];
+      listItemIds = {};
+      userLists.forEach((list) => {
+        listItemIds[list.id] = new Set();
+      });
+
+      syncWatchLaterState();
+    } catch {
+    }
 
     window.addEventListener("trendflix:languagechange", rerender);
 

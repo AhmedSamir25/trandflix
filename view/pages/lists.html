@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="lists.pageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · My Lists</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/lists.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/lists.js"></script>
+  </head>
+  <body>
+    <div class="lists-shell">
+      <nav class="lists-topbar">
+        <a class="back-link" href="/pages/app.html">← <span data-i18n="lists.backToHome">Back to Home</span></a>
+        <span class="lists-brand">TrendFlix</span>
+        <div class="lang-menu">
+          <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+          <div class="lang-menu-list" data-lang-menu>
+            <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+            <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+          </div>
+        </div>
+      </nav>
+
+      <header class="lists-hero">
+        <p class="lists-kicker" data-i18n="lists.kicker">Your collections</p>
+        <h1 data-i18n="lists.heading">My Lists</h1>
+        <p class="lists-subtitle" data-i18n="lists.subtitle">Create custom lists and organize movies, games, and books.</p>
+      </header>
+
+      <main>
+        <div class="lists-status" id="listsStatus" data-i18n="lists.loading">Loading lists...</div>
+
+        <div class="lists-actions" id="listsActions" hidden>
+          <form class="create-list-form" id="createListForm">
+            <input type="text" id="listNameInput" placeholder="New list name..." data-i18n-placeholder="lists.createPlaceholder" required maxlength="100" />
+            <button type="submit" id="createListBtn" data-i18n="lists.createBtn">Create List</button>
+          </form>
+        </div>
+
+        <section class="lists-grid" id="listsGrid" hidden></section>
+
+        <section class="list-detail" id="listDetail" hidden>
+          <div class="list-detail-header">
+            <button class="back-to-lists" id="backToLists" type="button">← <span data-i18n="lists.backToLists">Back to Lists</span></button>
+            <h2 class="list-detail-title" id="listDetailTitle"></h2>
+            <button class="delete-list-btn" id="deleteListBtn" type="button" data-i18n="lists.deleteList">Delete List</button>
+          </div>
+          <div class="lists-status" id="listDetailStatus" hidden></div>
+          <section class="lists-grid" id="listDetailGrid" hidden></section>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
