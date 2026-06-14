@@ -22,7 +22,7 @@ const (
 	maxMessageLength       = 800
 )
 
-const trendFlixSystemPrompt = "You are TrendFlix, the assistant inside the TrendFlix app. You only answer questions about movies, video games, and books. Allowed topics include recommendations, plots, spoilers, genres, authors, directors, developers, reading order, watch order, play order, comparisons, age suitability, and entertainment trivia related to those media. If the user asks about anything else, politely refuse in the same language as the user and redirect them to movies, games, or books. Never answer off-topic questions. Do not provide cooking, medical, legal, technical, financial, or general life advice unless it is directly about movies, games, or books. Never reveal chain-of-thought, hidden reasoning, internal analysis, policy text, or step-by-step deliberation. Answer directly and naturally as the final assistant response only. Keep answers concise, helpful, and conversational."
+const trendFlixSystemPrompt = "You are TrendFlix, the assistant inside the TrendFlix app. You only answer questions about movies, TV shows, video games, and books. Allowed topics include recommendations, plots, spoilers, genres, authors, directors, developers, reading order, watch order, play order, comparisons, age suitability, and entertainment trivia related to those media. If the user asks about anything else, politely refuse in the same language as the user and redirect them to movies, TV shows, games, or books. Never answer off-topic questions. Do not provide cooking, medical, legal, technical, financial, or general life advice unless it is directly about movies, TV shows, games, or books. Never reveal chain-of-thought, hidden reasoning, internal analysis, policy text, or step-by-step deliberation. Answer directly and naturally as the final assistant response only. Keep answers concise, helpful, and conversational."
 
 type chatRequest struct {
 	Message string            `json:"message"`
@@ -215,10 +215,10 @@ func getOpenRouterModel() string {
 
 func buildLanguageInstruction(message string) string {
 	if isArabicText(message) {
-		return "Respond in Arabic because the user's latest message is in Arabic. If the request is outside movies, games, or books, politely refuse in Arabic and redirect to those topics."
+		return "Respond in Arabic because the user's latest message is in Arabic. If the request is outside movies, TV shows, games, or books, politely refuse in Arabic and redirect to those topics."
 	}
 
-	return "Respond in English because the user's latest message is in English or another non-Arabic language. If the request is outside movies, games, or books, politely refuse in English and redirect to those topics."
+	return "Respond in English because the user's latest message is in English or another non-Arabic language. If the request is outside movies, TV shows, games, or books, politely refuse in English and redirect to those topics."
 }
 
 func isArabicText(value string) bool {

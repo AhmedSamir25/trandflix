@@ -2,6 +2,7 @@ let dashboardStats = null;
 
 const DASHBOARD_TYPE_META = {
   movie: { labelKey: "admin.typeMovie", fallback: "Movies", icon: "▶" },
+  tv_show: { labelKey: "admin.typeTvShow", fallback: "TV Shows", icon: "▣" },
   game: { labelKey: "admin.typeGame", fallback: "Games", icon: "◆" },
   book: { labelKey: "admin.typeBook", fallback: "Books", icon: "◫" },
 };
@@ -17,7 +18,7 @@ function setText(id, value) {
 }
 
 function getTypeCounts() {
-  const counts = { movie: 0, game: 0, book: 0 };
+  const counts = { movie: 0, tv_show: 0, game: 0, book: 0 };
   (dashboardStats?.type_counts || []).forEach((entry) => {
     if (counts[entry.type] !== undefined) counts[entry.type] = Number(entry.count) || 0;
   });
@@ -29,7 +30,7 @@ function renderTypeBars(typeCounts, totalItems) {
   if (!container) return;
 
   const max = Math.max(Number(totalItems) || 0, 1);
-  container.innerHTML = ["movie", "game", "book"]
+  container.innerHTML = ["movie", "tv_show", "game", "book"]
     .map((type) => {
       const value = typeCounts[type] || 0;
       const percent = Math.round((value / max) * 100);
@@ -107,7 +108,7 @@ function renderCategorySnapshot() {
 }
 
 function setDashboardLoading() {
-  ["statTotalItems", "statUsers", "statCategoriesCard", "statMovies", "statGames", "statBooks", "statCategories", "statAvgRating", "statLatestItem"].forEach((id) => {
+  ["statTotalItems", "statUsers", "statCategoriesCard", "statMovies", "statTvShows", "statGames", "statBooks", "statCategories", "statAvgRating", "statLatestItem"].forEach((id) => {
     setText(id, "-");
   });
 }
@@ -127,6 +128,7 @@ function renderDashboard() {
   setText("statUsers", Number(dashboardStats.total_users) || 0);
   setText("statCategoriesCard", Number(dashboardStats.total_categories) || 0);
   setText("statMovies", typeCounts.movie);
+  setText("statTvShows", typeCounts.tv_show);
   setText("statGames", typeCounts.game);
   setText("statBooks", typeCounts.book);
   setText("statCategories", Number(dashboardStats.total_categories) || 0);

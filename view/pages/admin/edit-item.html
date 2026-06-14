@@ -26,7 +26,7 @@
         <div>
           <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
           <h1 class="brand" data-i18n="admin.editItemHeading">Edit Item</h1>
-          <p class="admin-subtitle" data-i18n="admin.editItemSubtitle">Update an existing movie, game, or book in the catalog.</p>
+          <p class="admin-subtitle" data-i18n="admin.editItemSubtitle">Update an existing movie, TV show, game, or book in the catalog.</p>
         </div>
         <div class="admin-actions">
           <a class="ghost-link" href="/pages/admin/catalog.html" data-i18n="admin.navCatalog">Catalog</a>
@@ -55,6 +55,7 @@
                 <span data-i18n="admin.itemType">Type</span>
                 <select id="itemType" name="type">
                   <option value="movie" data-i18n="admin.typeMovie">Movie</option>
+                  <option value="tv_show" data-i18n="admin.typeTvShow">TV Show</option>
                   <option value="game" data-i18n="admin.typeGame">Game</option>
                   <option value="book" data-i18n="admin.typeBook">Book</option>
                 </select>
@@ -108,6 +109,16 @@
                   data-i18n-placeholder="admin.contentLinkMoviePlaceholder"
                 />
               </label>
+              <label class="field" data-field-for="tv_show">
+                <span data-i18n="admin.contentLinkTvShow">Watch link</span>
+                <input
+                  name="content_link"
+                  type="url"
+                  placeholder="https://example.com/watch"
+                  data-i18n-placeholder="admin.contentLinkTvShowPlaceholder"
+                  disabled
+                />
+              </label>
               <label class="field" data-field-for="game">
                 <span data-i18n="admin.contentLinkGame">Play link</span>
                 <input
@@ -145,6 +156,15 @@
                 <input name="director" type="text" />
               </label>
               <label class="field" data-field-for="movie">
+                <span data-i18n="admin.duration">Duration (minutes)</span>
+                <input name="duration" type="number" min="1" step="1" />
+              </label>
+
+              <label class="field" data-field-for="tv_show">
+                <span data-i18n="admin.director">Director</span>
+                <input name="director" type="text" />
+              </label>
+              <label class="field" data-field-for="tv_show">
                 <span data-i18n="admin.duration">Duration (minutes)</span>
                 <input name="duration" type="number" min="1" step="1" />
               </label>

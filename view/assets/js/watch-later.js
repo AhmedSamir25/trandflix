@@ -41,6 +41,7 @@ function getDetailHref(itemId) {
 function formatType(type) {
   const map = {
     movie: t("detail.typeMovie"),
+    tv_show: t("detail.typeTvShow"),
     game: t("detail.typeGame"),
     book: t("detail.typeBook"),
   };

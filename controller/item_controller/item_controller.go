@@ -394,8 +394,8 @@ func buildItemFromRequest(request itemRequest) (models.Item, string, int) {
 		return models.Item{}, "Title, type and release_date are required", fiber.StatusBadRequest
 	}
 
-	if request.Type != "book" && request.Type != "movie" && request.Type != "game" {
-		return models.Item{}, "Type must be book, movie or game", fiber.StatusBadRequest
+	if request.Type != models.ItemTypeBook && request.Type != models.ItemTypeMovie && request.Type != models.ItemTypeGame && request.Type != models.ItemTypeTVShow {
+		return models.Item{}, "Type must be book, movie, game or tv_show", fiber.StatusBadRequest
 	}
 
 	releaseDate, err := time.Parse("2006-01-02", request.ReleaseDate)
@@ -420,17 +420,17 @@ func buildItemFromRequest(request itemRequest) (models.Item, string, int) {
 	}
 
 	switch item.Type {
-	case "book":
+	case models.ItemTypeBook:
 		item.Director = nil
 		item.Developer = nil
 		item.Duration = nil
 		item.Platform = nil
-	case "movie":
+	case models.ItemTypeMovie, models.ItemTypeTVShow:
 		item.Author = nil
 		item.Developer = nil
 		item.PagesCount = nil
 		item.Platform = nil
-	case "game":
+	case models.ItemTypeGame:
 		item.Author = nil
 		item.Director = nil
 		item.Duration = nil

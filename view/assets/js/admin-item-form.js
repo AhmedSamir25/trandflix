@@ -125,7 +125,7 @@ function buildItemPayload(form) {
     payload.author = String(formData.get("author") || "").trim() || null;
     payload.pages_count = parseOptionalInteger(formData.get("pages_count"));
   }
-  if (type === "movie") {
+  if (type === "movie" || type === "tv_show") {
     payload.director = String(formData.get("director") || "").trim() || null;
     payload.duration = parseOptionalInteger(formData.get("duration"));
   }

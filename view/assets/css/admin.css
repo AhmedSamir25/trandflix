@@ -281,6 +281,7 @@
 }
 
 .filter-btn.type-movie.active { border-color: #38bdf8; color: #38bdf8; background: rgba(56,189,248,0.12); }
+.filter-btn.type-tv_show.active { border-color: #a78bfa; color: #c4b5fd; background: rgba(167,139,250,0.12); }
 .filter-btn.type-game.active  { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.12); }
 .filter-btn.type-book.active  { border-color: var(--gold); color: var(--gold); background: rgba(245,197,24,0.12); }
 
@@ -991,6 +992,7 @@ html[dir="rtl"] .stat-card::before {
 
 .stat-total { --stat-color: #d90416; }
 .stat-movie { --stat-color: #2563eb; }
+.stat-tv-show { --stat-color: #7c3aed; }
 .stat-game { --stat-color: #16a34a; }
 .stat-book { --stat-color: #b7791f; }
 
@@ -1129,6 +1131,7 @@ html[dir="rtl"] .stat-card::before {
 }
 
 .type-movie { --bar-color: #2563eb; }
+.type-tv_show { --bar-color: #7c3aed; }
 .type-game { --bar-color: #16a34a; }
 .type-book { --bar-color: #b7791f; }
 
@@ -1685,6 +1688,7 @@ body.admin-page {
 
 .admin-page .type-bar-track span,
 .admin-page .type-movie,
+.admin-page .type-tv_show,
 .admin-page .type-game,
 .admin-page .type-book {
   --bar-color: #e50914;
@@ -1697,6 +1701,7 @@ body.admin-page {
 }
 
 .admin-page .filter-btn.type-movie.active,
+.admin-page .filter-btn.type-tv_show.active,
 .admin-page .filter-btn.type-game.active,
 .admin-page .filter-btn.type-book.active {
   background: rgba(229, 9, 20, 0.2);

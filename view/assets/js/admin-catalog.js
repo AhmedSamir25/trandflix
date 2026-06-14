@@ -1,10 +1,11 @@
 let items = [];
 let activeFilter = "all";
 
-const TYPE_ICON = { movie: "🎬", game: "🎮", book: "📖" };
+const TYPE_ICON = { movie: "🎬", tv_show: "📺", game: "🎮", book: "📖" };
 
 function getTypeLabel(type) {
   if (type === "movie") return t("admin.typeMovie") || "Movie";
+  if (type === "tv_show") return t("admin.typeTvShow") || "TV Show";
   if (type === "game")  return t("admin.typeGame")  || "Game";
   return t("admin.typeBook") || "Book";
 }
@@ -17,7 +18,7 @@ function formatDuration(minutes) {
 }
 
 function getTypeMeta(item) {
-  if (item.type === "movie") return item.director || formatDuration(item.duration) || null;
+  if (item.type === "movie" || item.type === "tv_show") return item.director || formatDuration(item.duration) || null;
   if (item.type === "book")  return item.author || null;
   if (item.type === "game")  return item.developer || item.platform || null;
   return null;
@@ -27,12 +28,13 @@ function renderFilters() {
   const container = document.getElementById("catalogFilters");
   if (!container) return;
 
-  const counts = { all: items.length, movie: 0, game: 0, book: 0 };
+  const counts = { all: items.length, movie: 0, tv_show: 0, game: 0, book: 0 };
   items.forEach((item) => { if (counts[item.type] !== undefined) counts[item.type]++; });
 
   const filters = [
     { key: "all",   label: t("app.all")    || "All"    },
     { key: "movie", label: t("app.movies") || "Movies" },
+    { key: "tv_show", label: t("app.tvShows") || "TV Shows" },
     { key: "game",  label: t("app.games")  || "Games"  },
     { key: "book",  label: t("app.books")  || "Books"  },
   ];
@@ -40,7 +42,7 @@ function renderFilters() {
   container.innerHTML = filters
     .map(
       ({ key, label }) => `
-        <button class="filter-btn${activeFilter === key ? " active" : ""}${key !== "all" ? " filter-" + key : ""}"
+        <button class="filter-btn${activeFilter === key ? " active" : ""}${key !== "all" ? " type-" + key : ""}"
                 data-filter="${key}">
           ${key !== "all" ? TYPE_ICON[key] + " " : ""}${escapeHtml(label)}
           <span class="filter-count">${counts[key]}</span>

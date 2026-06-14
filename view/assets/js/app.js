@@ -1,9 +1,10 @@
 const TOKEN_KEY = "trendflix.token";
 
-const SECTION_ORDER = ["movie", "game", "book"];
+const SECTION_ORDER = ["movie", "tv_show", "game", "book"];
 
 const SECTION_META = {
   movie: { icon: "🎬", titleKey: "app.movies" },
+  tv_show: { icon: "📺", titleKey: "app.tvShows" },
   game: { icon: "🎮", titleKey: "app.games" },
   book: { icon: "📚", titleKey: "app.books" },
 };
@@ -30,6 +31,7 @@ let chatPending = false;
 
 const activeCategoryByType = {
   movie: "all",
+  tv_show: "all",
   game: "all",
   book: "all",
 };

@@ -72,6 +72,7 @@ async function fetchJson(url, token) {
 function getTypeMeta(type) {
   const map = {
     movie: { icon: "🎬", labelKey: "detail.typeMovie", actionKey: "common.watch", actionIcon: "▶" },
+    tv_show: { icon: "📺", labelKey: "detail.typeTvShow", actionKey: "common.watch", actionIcon: "▶" },
     game:  { icon: "🎮", labelKey: "detail.typeGame",  actionKey: "common.play",  actionIcon: "🎮" },
     book:  { icon: "📚", labelKey: "detail.typeBook",  actionKey: "common.read",  actionIcon: "📖" },
   };

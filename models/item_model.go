@@ -2,6 +2,13 @@ package models
 
 import "time"
 
+const (
+	ItemTypeBook   = "book"
+	ItemTypeMovie  = "movie"
+	ItemTypeTVShow = "tv_show"
+	ItemTypeGame   = "game"
+)
+
 type Item struct {
 	ID          uint       `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
 	Title       string     `gorm:"column:title;not null" json:"title"`

@@ -49,7 +49,7 @@ var defaultCategories = []models.Category{
 var defaultBanners = []models.Banner{
 	{
 		Title:     "Discover Entertainment",
-		Subtitle:  "Movies, games, and books picked for you every time you open TrendFlix.",
+		Subtitle:  "Movies, TV shows, games, and books picked for you every time you open TrendFlix.",
 		ImageURL:  "/assets/images/default-banner.svg",
 		LinkURL:   "",
 		IsActive:  true,
