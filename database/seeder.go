@@ -20,30 +20,30 @@ const (
 )
 
 var defaultCategories = []models.Category{
-	{Name: "Action", Slug: "action"},
-	{Name: "Adventure", Slug: "adventure"},
-	{Name: "Animation", Slug: "animation"},
-	{Name: "Biography", Slug: "biography"},
-	{Name: "Comedy", Slug: "comedy"},
-	{Name: "Crime", Slug: "crime"},
-	{Name: "Documentary", Slug: "documentary"},
-	{Name: "Drama", Slug: "drama"},
-	{Name: "Family", Slug: "family"},
-	{Name: "Fantasy", Slug: "fantasy"},
-	{Name: "History", Slug: "history"},
-	{Name: "Horror", Slug: "horror"},
-	{Name: "Music", Slug: "music"},
-	{Name: "Mystery", Slug: "mystery"},
-	{Name: "Musical", Slug: "musical"},
-	{Name: "Psychological", Slug: "psychological"},
-	{Name: "Romance", Slug: "romance"},
-	{Name: "Sci-Fi", Slug: "sci-fi"},
-	{Name: "Sport", Slug: "sport"},
-	{Name: "Superhero", Slug: "superhero"},
-	{Name: "Suspense", Slug: "suspense"},
-	{Name: "Thriller", Slug: "thriller"},
-	{Name: "War", Slug: "war"},
-	{Name: "Western", Slug: "western"},
+	{Name: "Action", NameAr: "أكشن", Slug: "action"},
+	{Name: "Adventure", NameAr: "مغامرة", Slug: "adventure"},
+	{Name: "Animation", NameAr: "رسوم متحركة", Slug: "animation"},
+	{Name: "Biography", NameAr: "سيرة ذاتية", Slug: "biography"},
+	{Name: "Comedy", NameAr: "كوميديا", Slug: "comedy"},
+	{Name: "Crime", NameAr: "جريمة", Slug: "crime"},
+	{Name: "Documentary", NameAr: "وثائقي", Slug: "documentary"},
+	{Name: "Drama", NameAr: "دراما", Slug: "drama"},
+	{Name: "Family", NameAr: "عائلي", Slug: "family"},
+	{Name: "Fantasy", NameAr: "خيال", Slug: "fantasy"},
+	{Name: "History", NameAr: "تاريخي", Slug: "history"},
+	{Name: "Horror", NameAr: "رعب", Slug: "horror"},
+	{Name: "Music", NameAr: "موسيقي", Slug: "music"},
+	{Name: "Mystery", NameAr: "غموض", Slug: "mystery"},
+	{Name: "Musical", NameAr: "موسيقي غنائي", Slug: "musical"},
+	{Name: "Psychological", NameAr: "نفسي", Slug: "psychological"},
+	{Name: "Romance", NameAr: "رومانسي", Slug: "romance"},
+	{Name: "Sci-Fi", NameAr: "خيال علمي", Slug: "sci-fi"},
+	{Name: "Sport", NameAr: "رياضة", Slug: "sport"},
+	{Name: "Superhero", NameAr: "أبطال خارقون", Slug: "superhero"},
+	{Name: "Suspense", NameAr: "تشويق", Slug: "suspense"},
+	{Name: "Thriller", NameAr: "إثارة", Slug: "thriller"},
+	{Name: "War", NameAr: "حرب", Slug: "war"},
+	{Name: "Western", NameAr: "غربي", Slug: "western"},
 }
 
 var defaultBanners = []models.Banner{
@@ -136,11 +136,14 @@ func SeedCategories() {
 		}
 
 		if result.RowsAffected > 0 {
-			if existingCategory.Name == category.Name {
+			if existingCategory.Name == category.Name && existingCategory.NameAr == category.NameAr {
 				continue
 			}
 
-			if err := DbConn.Model(&existingCategory).Update("name", category.Name).Error; err != nil {
+			if err := DbConn.Model(&existingCategory).Updates(map[string]interface{}{
+				"name":    category.Name,
+				"name_ar": category.NameAr,
+			}).Error; err != nil {
 				panic(fmt.Sprintf("category seed update failed for %s: %v", category.Slug, err))
 			}
 

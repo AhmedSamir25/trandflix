@@ -37,7 +37,7 @@ function renderItemCategoryOptions() {
         <label class="checkbox-card">
           <input type="checkbox" name="category_ids" value="${category.id}" ${checked} />
           <span>
-            <strong>${escapeHtml(category.name)}</strong>
+            <strong>${escapeHtml(categoryName(category))}</strong>
             <small>${escapeHtml(category.slug)}</small>
           </span>
         </label>

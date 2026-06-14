@@ -5,6 +5,10 @@ function t(key) {
   return window.TrendFlixI18n?.t(key) ?? key;
 }
 
+function categoryName(category) {
+  return window.TrendFlixI18n?.categoryName?.(category) || String(category?.name || "");
+}
+
 function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }

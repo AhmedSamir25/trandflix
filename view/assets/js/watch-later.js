@@ -8,6 +8,10 @@ function t(key) {
   return window.TrendFlixI18n?.t(key) ?? key;
 }
 
+function categoryName(category) {
+  return window.TrendFlixI18n?.categoryName?.(category) || String(category?.name || "");
+}
+
 function requireAuth() {
   const token = localStorage.getItem(TOKEN_KEY);
   if (!token) {
@@ -81,7 +85,7 @@ function renderItems() {
     const title = escapeHtml(item.title || "");
     const type = escapeHtml(formatType(item.type));
     const year = escapeHtml(String(formatDate(item.release_date) || ""));
-    const categories = (item.categories || []).map((category) => escapeHtml(category.name || "")).filter(Boolean).join(" • ");
+    const categories = (item.categories || []).map((category) => escapeHtml(categoryName(category))).filter(Boolean).join(" • ");
 
     return `
       <article class="lists-card" data-item-id="${item.id}" data-detail-url="${escapeHtml(getDetailHref(item.id))}" tabindex="0" role="link" aria-label="Open details for ${title}">

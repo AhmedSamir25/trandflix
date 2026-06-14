@@ -96,7 +96,7 @@ function renderCategorySnapshot() {
       (category) => `
         <a class="category-snapshot-pill" href="/pages/admin/categories.html">
           <span>
-            <strong>${escapeHtml(category.name)}</strong>
+            <strong>${escapeHtml(categoryName(category))}</strong>
             <code>${escapeHtml(category.slug)}</code>
           </span>
           <em>${Number(category.item_count) || 0}</em>

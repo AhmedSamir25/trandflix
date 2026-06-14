@@ -14,6 +14,10 @@ function t(key) {
   return window.TrendFlixI18n?.t(key) ?? key;
 }
 
+function categoryName(category) {
+  return window.TrendFlixI18n?.categoryName?.(category) || String(category?.name || "");
+}
+
 function escapeHtml(s) {
   return String(s ?? "")
     .replaceAll("&", "&amp;")
@@ -93,7 +97,7 @@ function buildMeta(item) {
 
 function buildCategories(categories) {
   if (!categories?.length) return "";
-  return categories.map(c => `<span class="detail-chip">${escapeHtml(c.name || "")}</span>`).join("");
+  return categories.map(c => `<span class="detail-chip">${escapeHtml(categoryName(c))}</span>`).join("");
 }
 
 function buildReviews(reviews) {

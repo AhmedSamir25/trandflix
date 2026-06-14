@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.createCategoryPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Create Category</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/admin-shared.js"></script>
+    <script defer src="/assets/js/admin-category-form.js"></script>
+  </head>
+  <body class="admin-page" data-category-form-mode="create">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" data-i18n="admin.createCategoryHeading">Create Category</h1>
+          <p class="admin-subtitle" data-i18n="admin.createCategorySubtitle">Add a new category to organise your library.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/admin/categories.html" data-i18n="admin.navCategories">Categories</a>
+        </div>
+      </header>
+
+<p id="pageError" class="notice error-notice" hidden></p>
+
+      <section class="dashboard-grid single-col">
+        <article class="card panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.categoryKicker">Categories</p>
+              <h2 data-i18n="admin.categoryTitle">Create a category</h2>
+            </div>
+          </div>
+
+          <form id="categoryForm" class="form-stack">
+            <label class="field">
+              <span data-i18n="admin.categoryName">Category name</span>
+              <input id="categoryName" name="name" type="text" required />
+            </label>
+            <label class="field">
+              <span data-i18n="admin.categoryNameAr">Category name (Arabic)</span>
+              <input id="categoryNameAr" name="name_ar" type="text" dir="rtl" />
+            </label>
+            <label class="field">
+              <span data-i18n="admin.categorySlug">Category slug</span>
+              <input id="categorySlug" name="slug" type="text" required />
+            </label>
+            <button class="btn primary" id="createCategoryBtn" type="submit" data-i18n="admin.createCategory">Create category</button>
+            <p id="categoryStatus" class="notice" hidden></p>
+          </form>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

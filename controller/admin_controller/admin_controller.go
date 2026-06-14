@@ -19,6 +19,7 @@ type typeCount struct {
 type categoryCount struct {
 	ID        uint   `json:"id" gorm:"column:id"`
 	Name      string `json:"name" gorm:"column:name"`
+	NameAr    string `json:"name_ar" gorm:"column:name_ar"`
 	Slug      string `json:"slug" gorm:"column:slug"`
 	ItemCount int64  `json:"item_count" gorm:"column:item_count"`
 }
@@ -105,9 +106,9 @@ func fetchCategoryCounts() ([]categoryCount, error) {
 	var categoryCounts []categoryCount
 	if err := database.DbConn.
 		Table("categories").
-		Select("categories.id, categories.name, categories.slug, COUNT(category_item.item_id) AS item_count").
+		Select("categories.id, categories.name, categories.name_ar, categories.slug, COUNT(category_item.item_id) AS item_count").
 		Joins("LEFT JOIN category_item ON category_item.category_id = categories.id").
-		Group("categories.id, categories.name, categories.slug").
+		Group("categories.id, categories.name, categories.name_ar, categories.slug").
 		Order("categories.name ASC").
 		Scan(&categoryCounts).Error; err != nil {
 		return nil, err

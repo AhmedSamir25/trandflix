@@ -14,12 +14,14 @@ import (
 )
 
 type bannerRequest struct {
-	Title     string `json:"title"`
-	Subtitle  string `json:"subtitle"`
-	ImageURL  string `json:"image_url"`
-	LinkURL   string `json:"link_url"`
-	IsActive  *bool  `json:"is_active"`
-	SortOrder int    `json:"sort_order"`
+	Title      string `json:"title"`
+	Subtitle   string `json:"subtitle"`
+	TitleAr    string `json:"title_ar"`
+	SubtitleAr string `json:"subtitle_ar"`
+	ImageURL   string `json:"image_url"`
+	LinkURL    string `json:"link_url"`
+	IsActive   *bool  `json:"is_active"`
+	SortOrder  int    `json:"sort_order"`
 }
 
 func GetActiveBanners(c *fiber.Ctx) error {
@@ -159,6 +161,8 @@ func UpdateBanner(c *fiber.Ctx) error {
 
 	banner.Title = updated.Title
 	banner.Subtitle = updated.Subtitle
+	banner.TitleAr = updated.TitleAr
+	banner.SubtitleAr = updated.SubtitleAr
 	banner.ImageURL = updated.ImageURL
 	banner.LinkURL = updated.LinkURL
 	banner.IsActive = updated.IsActive
@@ -221,6 +225,8 @@ func DeleteBanner(c *fiber.Ctx) error {
 func buildBannerFromRequest(request bannerRequest, isNew bool) (models.Banner, string, int) {
 	request.Title = strings.TrimSpace(request.Title)
 	request.Subtitle = strings.TrimSpace(request.Subtitle)
+	request.TitleAr = strings.TrimSpace(request.TitleAr)
+	request.SubtitleAr = strings.TrimSpace(request.SubtitleAr)
 	request.ImageURL = strings.TrimSpace(request.ImageURL)
 	request.LinkURL = strings.TrimSpace(request.LinkURL)
 
@@ -237,11 +243,13 @@ func buildBannerFromRequest(request bannerRequest, isNew bool) (models.Banner, s
 	}
 
 	return models.Banner{
-		Title:     request.Title,
-		Subtitle:  request.Subtitle,
-		ImageURL:  request.ImageURL,
-		LinkURL:   request.LinkURL,
-		IsActive:  isActive,
-		SortOrder: request.SortOrder,
+		Title:      request.Title,
+		Subtitle:   request.Subtitle,
+		TitleAr:    request.TitleAr,
+		SubtitleAr: request.SubtitleAr,
+		ImageURL:   request.ImageURL,
+		LinkURL:    request.LinkURL,
+		IsActive:   isActive,
+		SortOrder:  request.SortOrder,
 	}, "", 0
 }

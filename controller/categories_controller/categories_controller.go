@@ -14,8 +14,9 @@ import (
 )
 
 type categoryRequest struct {
-	Name string `json:"name"`
-	Slug string `json:"slug"`
+	Name   string `json:"name"`
+	NameAr string `json:"name_ar"`
+	Slug   string `json:"slug"`
 }
 
 func GetCategories(c *fiber.Ctx) error {
@@ -66,6 +67,7 @@ func CreateCategory(c *fiber.Ctx) error {
 	}
 
 	request.Name = strings.TrimSpace(request.Name)
+	request.NameAr = strings.TrimSpace(request.NameAr)
 	request.Slug = strings.TrimSpace(request.Slug)
 
 	if request.Name == "" || request.Slug == "" {
@@ -89,8 +91,9 @@ func CreateCategory(c *fiber.Ctx) error {
 	}
 
 	record := models.Category{
-		Name: request.Name,
-		Slug: request.Slug,
+		Name:   request.Name,
+		NameAr: request.NameAr,
+		Slug:   request.Slug,
 	}
 
 	result = database.DbConn.Create(&record)
@@ -135,6 +138,7 @@ func UpdateCategory(c *fiber.Ctx) error {
 	}
 
 	request.Name = strings.TrimSpace(request.Name)
+	request.NameAr = strings.TrimSpace(request.NameAr)
 	request.Slug = strings.TrimSpace(request.Slug)
 
 	if request.Name == "" || request.Slug == "" {
@@ -173,6 +177,7 @@ func UpdateCategory(c *fiber.Ctx) error {
 	}
 
 	category.Name = request.Name
+	category.NameAr = request.NameAr
 	category.Slug = request.Slug
 
 	result = database.DbConn.Save(&category)

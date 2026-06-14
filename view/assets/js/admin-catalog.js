@@ -66,7 +66,7 @@ function renderItemList() {
       const year     = item.release_date ? new Date(item.release_date).getFullYear() : null;
       const typeMeta = getTypeMeta(item);
       const icon     = TYPE_ICON[item.type] || "";
-      const cats     = (item.categories || []).map((c) => escapeHtml(c.name)).join(", ");
+      const cats     = (item.categories || []).map((c) => escapeHtml(categoryName(c))).join(", ");
 
       return `
         <article class="catalog-card" data-type="${escapeHtml(item.type)}">

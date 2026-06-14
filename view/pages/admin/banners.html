@@ -30,61 +30,22 @@
         </div>
         <div class="admin-actions">
           <a class="ghost-link" href="/pages/app.html" data-i18n="admin.backToApp">Back to app</a>
-          <button class="btn primary compact-btn" id="logoutBtn" type="button" data-i18n="admin.logout">Logout</button>
         </div>
       </header>
 
       <p id="pageError" class="notice error-notice" hidden></p>
 
-      <section class="dashboard-grid single-col">
-        <article class="card panel">
-          <div class="panel-heading">
-            <div>
-              <p class="panel-kicker" data-i18n="admin.bannerKicker">Banners</p>
-              <h2 id="bannerFormTitle" data-i18n="admin.bannerCreateTitle">Add a banner</h2>
-            </div>
-            <button class="text-btn" id="refreshBannersBtn" type="button" data-i18n="admin.refresh">Refresh</button>
+      <section class="card panel">
+        <div class="panel-heading banner-list-heading">
+          <div>
+            <p class="panel-kicker" data-i18n="admin.bannerKicker">Banners</p>
+            <h2 data-i18n="admin.currentBanners">Current banners</h2>
           </div>
-
-          <form id="bannerForm" class="form-stack">
-            <label class="field">
-              <span data-i18n="admin.bannerTitle">Title</span>
-              <input id="bannerTitle" name="title" type="text" required />
-            </label>
-            <label class="field">
-              <span data-i18n="admin.bannerSubtitle">Subtitle</span>
-              <input id="bannerSubtitle" name="subtitle" type="text" />
-            </label>
-            <label class="field">
-              <span data-i18n="admin.bannerImageUrl">Image URL</span>
-              <input id="bannerImageUrl" name="image_url" type="url" required />
-            </label>
-            <label class="field">
-              <span data-i18n="admin.bannerLinkUrl">Link URL (optional)</span>
-              <input id="bannerLinkUrl" name="link_url" type="text" />
-            </label>
-            <label class="field">
-              <span data-i18n="admin.bannerSortOrder">Sort order</span>
-              <input id="bannerSortOrder" name="sort_order" type="number" value="0" min="0" />
-            </label>
-            <label class="field field-inline">
-              <input id="bannerIsActive" name="is_active" type="checkbox" checked />
-              <span data-i18n="admin.bannerIsActive">Active (visible on home page)</span>
-            </label>
-            <div class="form-row">
-              <button class="btn primary" id="saveBannerBtn" type="submit" data-i18n="admin.bannerCreate">Add banner</button>
-              <button class="btn ghost" id="cancelEditBtn" type="button" hidden data-i18n="admin.cancel">Cancel</button>
-            </div>
-            <p id="bannerStatus" class="notice" hidden></p>
-          </form>
-
-          <div class="list-block" style="margin-top: 24px;">
-            <div class="list-header">
-              <h3 data-i18n="admin.currentBanners">Current banners</h3>
-            </div>
-            <div id="bannerList"></div>
+          <div class="row-actions">
+            <a class="btn primary compact-btn" href="/pages/admin/create-banner.html" data-i18n="admin.addBanner">Add banner</a>
           </div>
-        </article>
+        </div>
+        <div id="bannerList" class="banner-grid"></div>
       </section>
     </main>
   </body>

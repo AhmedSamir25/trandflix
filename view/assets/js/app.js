@@ -23,6 +23,8 @@ let searchQuery = "";
 let catalogStatusKey = "app.loadingCatalog";
 let currentToken = "";
 let favoriteItemIds = new Set();
+let recommendations = [];
+let activeRecommendationType = "all";
 let chatHistory = [];
 let chatPending = false;
 
@@ -38,6 +40,10 @@ function t(key) {
 
 function getLang() {
   return window.TrendFlixI18n?.getLang?.() || "en";
+}
+
+function categoryName(category) {
+  return window.TrendFlixI18n?.categoryName?.(category) || String(category?.name || "");
 }
 
 function requireAuth() {
@@ -155,9 +161,15 @@ function errorBanner(message, details) {
   console.error(BANNER_LOG_PREFIX, message, details);
 }
 
+function localizedBannerText(primary, alternate) {
+  return window.TrendFlixI18n?.localizedText?.(primary, alternate) ?? String(primary || alternate || "").trim();
+}
+
 function normalizeBanner(banner) {
   const title = String(banner?.title || "").trim();
+  const titleAr = String(banner?.title_ar || "").trim();
   const subtitle = String(banner?.subtitle || "").trim();
+  const subtitleAr = String(banner?.subtitle_ar || "").trim();
   const imageUrl = String(banner?.image_url || "").trim();
   if (!title || !imageUrl) {
     warnBanner("normalize skipped invalid banner", banner);
@@ -167,7 +179,9 @@ function normalizeBanner(banner) {
   const normalized = {
     id: banner?.id ?? title,
     title,
+    title_ar: titleAr,
     subtitle,
+    subtitle_ar: subtitleAr,
     imageUrl,
   };
 
@@ -193,12 +207,15 @@ function handleBannerImageError(event) {
 }
 
 function createBannerMarkup(banner, index) {
+  const title = localizedBannerText(banner.title, banner.title_ar);
+  const subtitle = localizedBannerText(banner.subtitle, banner.subtitle_ar);
+
   return `
     <article class="banner-slide${index === activeBannerIndex ? " active" : ""}" aria-hidden="${index === activeBannerIndex ? "false" : "true"}">
-      <img class="banner-image" src="${escapeHtml(banner.imageUrl)}" alt="${escapeHtml(banner.title)}" loading="eager" referrerpolicy="no-referrer" onload="handleBannerImageLoad(event)" onerror="handleBannerImageError(event)" />
+      <img class="banner-image" src="${escapeHtml(banner.imageUrl)}" alt="${escapeHtml(title)}" loading="eager" referrerpolicy="no-referrer" onload="handleBannerImageLoad(event)" onerror="handleBannerImageError(event)" />
       <div class="banner-content">
-        <h1>${escapeHtml(banner.title)}</h1>
-        ${banner.subtitle ? `<p class="banner-description">${escapeHtml(banner.subtitle)}</p>` : ""}
+        <h1>${escapeHtml(title)}</h1>
+        ${subtitle ? `<p class="banner-description">${escapeHtml(subtitle)}</p>` : ""}
       </div>
     </article>
   `;
@@ -302,7 +319,7 @@ function card(item) {
   const isFavorite = favoriteItemIds.has(String(item.id));
   const categoryNames = (item.categories || [])
     .slice(0, 2)
-    .map((c) => escapeHtml(c.name || ""))
+    .map((c) => escapeHtml(categoryName(c)))
     .filter(Boolean)
     .join(" • ");
 
@@ -338,7 +355,7 @@ function createCategoryChips(type) {
   for (const category of typeCategories) {
     const isActive = String(category.id) === activeCategory;
     chips.push(
-      `<button class="${isActive ? "chip active" : "chip"}" data-category-id="${category.id}" data-type="${type}" type="button">${escapeHtml(category.name)}</button>`,
+      `<button class="${isActive ? "chip active" : "chip"}" data-category-id="${category.id}" data-type="${type}" type="button">${escapeHtml(categoryName(category))}</button>`,
     );
   }
 
@@ -369,6 +386,105 @@ function createSection(type) {
   `;
 }
 
+function recommendationCard(rec) {
+  const favoriteLabel = t("app.toggleFavorite");
+  const safeName = escapeHtml(rec.title || "");
+  const safeImg = escapeHtml(rec.cover_image || getFallbackImage(rec.title));
+  const rating = rec.rating ? `⭐ ${rec.rating}` : "";
+  const isFavorite = favoriteItemIds.has(String(rec.id));
+  const categoryNames = (rec.categories || [])
+    .slice(0, 2)
+    .map((category) => escapeHtml(typeof category === "string" ? category : categoryName(category)))
+    .filter(Boolean)
+    .join(" • ");
+
+  return `
+    <article
+      class="card-item card-rec"
+      data-detail-url="${escapeHtml(getDetailHref(rec.id))}"
+      tabindex="0"
+      role="link"
+      aria-label="Open details for ${safeName}"
+    >
+      <button class="heart-btn${isFavorite ? " active" : ""}" type="button" aria-label="${escapeHtml(favoriteLabel)}" data-fav data-item-id="${rec.id}">❤</button>
+      <img src="${safeImg}" alt="${safeName}" loading="lazy" />
+      <div class="title">${safeName}</div>
+      <div class="card-info">
+        ${rating ? `<span class="info-tag rating">${rating}</span>` : ""}
+        ${categoryNames ? `<span class="info-tag categories">${categoryNames}</span>` : ""}
+      </div>
+    </article>
+  `;
+}
+
+function getFilteredRecommendations() {
+  if (activeRecommendationType === "all") {
+    return recommendations;
+  }
+  return recommendations.filter((rec) => rec.type === activeRecommendationType);
+}
+
+function createRecommendationTypeChips() {
+  const chips = [
+    `<button class="${activeRecommendationType === "all" ? "chip active" : "chip"}" data-rec-type="all" type="button">${escapeHtml(t("app.all"))}</button>`,
+  ];
+
+  for (const type of SECTION_ORDER) {
+    const meta = SECTION_META[type];
+    if (!meta) continue;
+    chips.push(
+      `<button class="${activeRecommendationType === type ? "chip active" : "chip"}" data-rec-type="${type}" type="button">${meta.icon} ${escapeHtml(t(meta.titleKey))}</button>`,
+    );
+  }
+
+  return chips.join("");
+}
+
+function createRecommendationSection() {
+  if (!recommendations.length) return "";
+  if (searchQuery.trim()) return "";
+
+  const filteredRecommendations = getFilteredRecommendations();
+  const content = filteredRecommendations.length
+    ? filteredRecommendations.map((rec) => recommendationCard(rec)).join("")
+    : `<p class="row-status">${escapeHtml(t("app.noItemsFound"))}</p>`;
+
+  return `
+    <section class="section section-rec" data-section="recommendations">
+      <h2>✨ <span>${escapeHtml(t("app.recommendedForYou"))}</span></h2>
+      <div class="cat-row rec-type-row" data-rec-type-row>
+        ${createRecommendationTypeChips()}
+      </div>
+      <div class="row-wrapper">
+        <button class="row-arrow row-arrow-left" type="button" aria-label="Scroll left">◀</button>
+        <div class="row">${content}</div>
+        <button class="row-arrow row-arrow-right" type="button" aria-label="Scroll right">▶</button>
+      </div>
+    </section>
+  `;
+}
+
+function normalizeRecommendationFromItem(item, reason) {
+  return {
+    id: item.id,
+    title: item.title,
+    type: item.type,
+    cover_image: item.cover_image,
+    rating: item.rating,
+    categories: (item.categories || []).map((category) => categoryName(category)).filter(Boolean),
+    reason,
+  };
+}
+
+function buildLocalRecommendationFallback(limit = 20) {
+  return items
+    .filter((item) => item?.id && !favoriteItemIds.has(String(item.id)))
+    .slice()
+    .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0) || Number(b.id || 0) - Number(a.id || 0))
+    .slice(0, limit)
+    .map((item) => normalizeRecommendationFromItem(item, t("app.localRecommendationReason")));
+}
+
 function setCatalogStatus(messageKey) {
   catalogStatusKey = messageKey;
   const catalogSections = document.getElementById("catalogSections");
@@ -388,7 +504,8 @@ function renderCatalog() {
   }
 
   catalogStatusKey = "";
-  catalogSections.innerHTML = availableTypes.map((type) => createSection(type)).join("");
+  catalogSections.innerHTML =
+    createRecommendationSection() + availableTypes.map((type) => createSection(type)).join("");
 }
 
 async function fetchJson(url, options = {}, token = "", timeoutMs = 20000) {
@@ -471,6 +588,20 @@ async function loadFavoriteItemIds(token) {
   favoriteItemIds = new Set(
     (Array.isArray(response?.items) ? response.items : []).map((item) => String(item.id)),
   );
+}
+
+async function loadRecommendations(token) {
+  try {
+    const response = await fetchJson("/api/recommendations/for-you?limit=20", {}, token);
+    recommendations = Array.isArray(response?.data) ? response.data : [];
+  } catch (error) {
+    console.error("Failed to load API recommendations", error);
+    recommendations = [];
+  }
+
+  if (!recommendations.length) {
+    recommendations = buildLocalRecommendationFallback(20);
+  }
 }
 
 async function toggleFavorite(btn) {
@@ -659,11 +790,18 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   try {
     await loadFavoriteItemIds(token);
-    renderCatalog();
-    initRowArrows();
   } catch (error) {
     console.error("Failed to load favorites", error);
   }
+
+  try {
+    await loadRecommendations(token);
+  } catch (error) {
+    console.error("Failed to load recommendations", error);
+  }
+
+  renderCatalog();
+  initRowArrows();
 
   document.getElementById("menuBtn")?.addEventListener("click", toggleSidebar);
   document.getElementById("overlay")?.addEventListener("click", closeSidebar);
@@ -672,6 +810,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("searchInput")?.addEventListener("input", (e) => updateSearch(e.target.value || ""));
 
   document.body.addEventListener("click", async (e) => {
+    const recTypeChip = e.target.closest?.("[data-rec-type]");
+    if (recTypeChip) {
+      activeRecommendationType = recTypeChip.getAttribute("data-rec-type") || "all";
+      renderCatalog();
+      initRowArrows();
+      return;
+    }
+
     const chip = e.target.closest?.(".chip");
     if (chip) {
       const type = chip.getAttribute("data-type") || "";
