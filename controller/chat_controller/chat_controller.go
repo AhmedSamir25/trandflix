@@ -16,10 +16,14 @@ import (
 )
 
 const (
-	openRouterURL          = "https://openrouter.ai/api/v1/chat/completions"
-	defaultOpenRouterModel = "openai/gpt-4o-mini"
-	maxChatHistoryMessages = 8
-	maxMessageLength       = 800
+	chatProviderOpenRouter       = "openrouter"
+	chatProviderOpenAICompatible = "openai_compatible"
+	openRouterURL                = "https://openrouter.ai/api/v1/chat/completions"
+	defaultOpenRouterModel       = "openai/gpt-4o-mini"
+	defaultOpenAICompatibleURL   = "https://api.openai.com/v1/chat/completions"
+	defaultOpenAICompatibleModel = "gpt-4o-mini"
+	maxChatHistoryMessages       = 8
+	maxMessageLength             = 800
 )
 
 const trendFlixSystemPrompt = "You are TrendFlix, the assistant inside the TrendFlix app. You only answer questions about movies, TV shows, video games, and books. Allowed topics include recommendations, plots, spoilers, genres, authors, directors, developers, reading order, watch order, play order, comparisons, age suitability, and entertainment trivia related to those media. If the user asks about anything else, politely refuse in the same language as the user and redirect them to movies, TV shows, games, or books. Never answer off-topic questions. Do not provide cooking, medical, legal, technical, financial, or general life advice unless it is directly about movies, TV shows, games, or books. Never reveal chain-of-thought, hidden reasoning, internal analysis, policy text, or step-by-step deliberation. Answer directly and naturally as the final assistant response only. Keep answers concise, helpful, and conversational."
@@ -57,9 +61,10 @@ func Reply(c *fiber.Ctx) error {
 		"msg":        "Chat reply generated successfully",
 	}
 
-	apiKey := strings.TrimSpace(os.Getenv("OPENROUTER_API_KEY"))
+	provider := getChatAIProvider()
+	apiKey := getChatAIAPIKey(provider)
 	if apiKey == "" {
-		log.Println("OPENROUTER_API_KEY is not configured")
+		log.Println("AI API key is not configured")
 		contextMap["statusText"] = "bad"
 		contextMap["msg"] = "Chat service is unavailable right now"
 		return c.Status(fiber.StatusServiceUnavailable).JSON(contextMap)
@@ -93,7 +98,7 @@ func Reply(c *fiber.Ctx) error {
 	messages = append(messages, openRouterEntry{Role: "user", Content: message})
 
 	payload := openRouterRequest{
-		Model:       getOpenRouterModel(),
+		Model:       getChatAIModel(provider),
 		Messages:    messages,
 		Temperature: 0.4,
 		MaxTokens:   280,
@@ -111,7 +116,7 @@ func Reply(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodPost, openRouterURL, bytes.NewReader(body))
+	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodPost, getChatAIURL(provider), bytes.NewReader(body))
 	if err != nil {
 		log.Println("Error creating OpenRouter request:", err)
 		contextMap["statusText"] = "bad"
@@ -121,9 +126,12 @@ func Reply(c *fiber.Ctx) error {
 
 	httpRequest.Header.Set("Authorization", "Bearer "+apiKey)
 	httpRequest.Header.Set("Content-Type", "application/json")
-	httpRequest.Header.Set("X-Title", "TrendFlix")
+	if provider == chatProviderOpenRouter {
+		httpRequest.Header.Set("X-Title", "TrendFlix")
+	}
 
-	if siteURL := strings.TrimSpace(os.Getenv("APP_BASE_URL")); siteURL != "" {
+	if provider == chatProviderOpenRouter && strings.TrimSpace(os.Getenv("APP_BASE_URL")) != "" {
+		siteURL := strings.TrimSpace(os.Getenv("APP_BASE_URL"))
 		httpRequest.Header.Set("HTTP-Referer", siteURL)
 	}
 
@@ -204,13 +212,73 @@ func normalizeHistory(history []openRouterEntry) []openRouterEntry {
 	return normalized
 }
 
-func getOpenRouterModel() string {
-	model := strings.TrimSpace(os.Getenv("OPENROUTER_MODEL"))
-	if model == "" {
-		return defaultOpenRouterModel
+func getChatAIProvider() string {
+	provider := strings.ToLower(strings.TrimSpace(os.Getenv("AI_PROVIDER")))
+	switch provider {
+	case "", chatProviderOpenRouter:
+		return chatProviderOpenRouter
+	case chatProviderOpenAICompatible, "openai-compatible", "openai", "compatible":
+		return chatProviderOpenAICompatible
+	default:
+		return chatProviderOpenRouter
+	}
+}
+
+func getChatAIAPIKey(provider string) string {
+	if provider == chatProviderOpenAICompatible {
+		for _, key := range []string{"OPENAI_COMPATIBLE_API_KEY", "OPENAI_API_KEY", "AI_API_KEY"} {
+			if value := strings.TrimSpace(os.Getenv(key)); value != "" {
+				return value
+			}
+		}
+		return ""
 	}
 
-	return model
+	if value := strings.TrimSpace(os.Getenv("OPENROUTER_API_KEY")); value != "" {
+		return value
+	}
+	return strings.TrimSpace(os.Getenv("AI_API_KEY"))
+}
+
+func getChatAIURL(provider string) string {
+	if provider == chatProviderOpenAICompatible {
+		for _, key := range []string{"OPENAI_COMPATIBLE_BASE_URL", "OPENAI_BASE_URL", "AI_BASE_URL"} {
+			if value := normalizeChatAIChatCompletionsURL(os.Getenv(key)); value != "" {
+				return value
+			}
+		}
+		return defaultOpenAICompatibleURL
+	}
+
+	return openRouterURL
+}
+
+func getChatAIModel(provider string) string {
+	if provider == chatProviderOpenAICompatible {
+		for _, key := range []string{"OPENAI_COMPATIBLE_MODEL", "OPENAI_MODEL", "AI_MODEL"} {
+			if value := strings.TrimSpace(os.Getenv(key)); value != "" {
+				return value
+			}
+		}
+		return defaultOpenAICompatibleModel
+	}
+
+	if model := strings.TrimSpace(os.Getenv("OPENROUTER_MODEL")); model != "" {
+		return model
+	}
+
+	return defaultOpenRouterModel
+}
+
+func normalizeChatAIChatCompletionsURL(value string) string {
+	baseURL := strings.TrimRight(strings.TrimSpace(value), "/")
+	if baseURL == "" {
+		return ""
+	}
+	if strings.HasSuffix(baseURL, "/chat/completions") {
+		return baseURL
+	}
+	return baseURL + "/chat/completions"
 }
 
 func buildLanguageInstruction(message string) string {

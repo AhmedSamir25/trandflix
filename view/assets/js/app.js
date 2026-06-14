@@ -625,6 +625,25 @@ async function toggleFavorite(btn) {
   }
 }
 
+async function toggleWatchLater(btn) {
+  const itemId = btn.getAttribute("data-item-id") || "";
+  if (!itemId || !currentToken) return;
+
+  const isActive = btn.classList.contains("active");
+  btn.disabled = true;
+
+  try {
+    await fetchJson(`/watch-later/${itemId}`, { method: isActive ? "DELETE" : "POST" }, currentToken);
+    btn.classList.toggle("active", !isActive);
+    if (!isActive) btn.classList.add("added");
+    else btn.classList.remove("added");
+  } catch (error) {
+    console.error("Failed to toggle watch later", error);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 function openSidebar() {
   document.getElementById("sidebar")?.classList.add("active");
   const overlay = document.getElementById("overlay");
@@ -701,6 +720,102 @@ async function requestTrendFlixReply(message) {
   );
 
   return String(response?.reply || "").trim();
+}
+
+function aiTypeLabel(type) {
+  const map = {
+    movie: t("app.typeMovie"),
+    tv_show: t("app.typeTvShow"),
+    game: t("app.typeGame"),
+    book: t("app.typeBook"),
+  };
+  return map[type] || type || "";
+}
+
+function aiLaterLabel(type) {
+  if (type === "book") return t("app.readLater");
+  if (type === "game") return t("app.playLater");
+  return t("app.watchLater");
+}
+
+function recommendationCardMarkup(rec) {
+  const safeTitle = escapeHtml(rec.title || "");
+  const safeType = escapeHtml(aiTypeLabel(rec.type));
+  const safeDesc = escapeHtml(rec.description || "");
+  const safeReason = escapeHtml(rec.reason || "");
+  const safeImg = escapeHtml(rec.image || getFallbackImage(rec.title));
+  const rating = rec.rating ? `⭐ ${rec.rating}` : "";
+
+  const isDb = rec.is_available_in_app === true && rec.source === "database";
+  const statusBadge = isDb
+    ? `<span class="rec-badge rec-badge-db">${escapeHtml(t("app.aiAvailableInApp"))}</span>`
+    : `<span class="rec-badge rec-badge-ext">${escapeHtml(t("app.aiExternal"))}</span>`;
+
+  let actions = "";
+  if (isDb && rec.item_id) {
+    const itemId = escapeHtml(String(rec.item_id));
+    actions = `
+      <div class="rec-actions">
+        <button class="rec-action rec-fav" type="button" data-ai-fav data-item-id="${itemId}">❤ ${escapeHtml(t("app.addToFavorites"))}</button>
+        <button class="rec-action rec-later" type="button" data-ai-later data-item-id="${itemId}">🕒 ${escapeHtml(aiLaterLabel(rec.type))}</button>
+      </div>`;
+  } else {
+    actions = `<p class="rec-unavailable">${escapeHtml(t("app.aiNotAvailableInApp"))}</p>`;
+  }
+
+  const detailAttr = isDb && rec.item_id
+    ? `data-detail-url="${escapeHtml(getDetailHref(rec.item_id))}"`
+    : "";
+
+  return `
+    <article class="rec-card${isDb ? "" : " rec-card-external"}" ${detailAttr}>
+      <div class="rec-card-top">
+        <img class="rec-card-img" src="${safeImg}" alt="${safeTitle}" loading="lazy" />
+        <div class="rec-card-meta">
+          <div class="rec-card-head">
+            <span class="rec-card-type">${safeType}</span>
+            ${rating ? `<span class="rec-card-rating">${rating}</span>` : ""}
+          </div>
+          <h4 class="rec-card-title">${safeTitle}</h4>
+          ${statusBadge}
+        </div>
+      </div>
+      ${safeDesc ? `<p class="rec-card-desc">${safeDesc}</p>` : ""}
+      <p class="rec-card-reason">💬 ${safeReason}</p>
+      ${actions}
+    </article>
+  `;
+}
+
+function renderRecommendationsInto(botEl, recommendations) {
+  if (!Array.isArray(recommendations) || !recommendations.length || !botEl) return;
+  const wrap = document.createElement("div");
+  wrap.className = "rec-cards";
+  wrap.innerHTML = recommendations.map(recommendationCardMarkup).join("");
+  botEl.appendChild(wrap);
+}
+
+async function requestAIRecommendations(message) {
+  const response = await fetchJson(
+    "/api/ai-assistant/recommend",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_message: message,
+        limit: 8,
+      }),
+    },
+    currentToken,
+  );
+
+  const data = response?.data || {};
+  return {
+    reply: String(data.reply || "").trim(),
+    recommendations: Array.isArray(data.recommendations) ? data.recommendations : [],
+  };
 }
 
 function updateSearch(value) {
@@ -840,6 +955,22 @@ window.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    const aiFav = e.target.closest?.("[data-ai-fav]");
+    if (aiFav) {
+      e.preventDefault();
+      e.stopPropagation();
+      await toggleFavorite(aiFav);
+      return;
+    }
+
+    const aiLater = e.target.closest?.("[data-ai-later]");
+    if (aiLater) {
+      e.preventDefault();
+      e.stopPropagation();
+      await toggleWatchLater(aiLater);
+      return;
+    }
+
     const navLink = e.target.closest?.("[data-nav='watch-later']");
     if (navLink) {
       e.preventDefault();
@@ -850,6 +981,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     const cardEl = e.target.closest?.(".card-item[data-detail-url]");
     if (cardEl) {
       openCardDetail(cardEl);
+      return;
+    }
+
+    const aiCardEl = e.target.closest?.(".rec-card[data-detail-url]");
+    if (aiCardEl) {
+      openCardDetail(aiCardEl);
     }
   });
 
@@ -884,15 +1021,21 @@ window.addEventListener("DOMContentLoaded", async () => {
     setChatPendingState(true);
 
     try {
-      const reply = await requestTrendFlixReply(text);
+      const result = await requestAIRecommendations(text);
       loadingMsg.remove();
 
-      const safeReply = reply || t("app.chatError");
+      const safeReply = result.reply || t("app.chatError");
       addMsg("bot", formatChatMessage(safeReply));
+
+      const logs2 = document.getElementById("chatLogs");
+      const lastBot = logs2 ? logs2.querySelector(".bot-msg:last-child") : null;
+      renderRecommendationsInto(lastBot, result.recommendations);
+      if (logs2) logs2.scrollTop = logs2.scrollHeight;
+
       pushChatHistory("user", text);
       pushChatHistory("assistant", safeReply);
     } catch (error) {
-      console.error("Failed to fetch TrendFlix chat reply", error);
+      console.error("Failed to fetch AI recommendations", error);
       loadingMsg.remove();
       addMsg("bot", escapeHtml(t("app.chatError")));
     } finally {

@@ -60,6 +60,29 @@ function getItemIdFromLocation() {
   return match ? decodeURIComponent(match[1]) : "";
 }
 
+function parseJwtPayload(token) {
+  try {
+    const payload = token.split(".")[1] || "";
+    const normalized = payload.replaceAll("-", "+").replaceAll("_", "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    return JSON.parse(window.atob(padded));
+  } catch {
+    return null;
+  }
+}
+
+function getCurrentUserId() {
+  if (!currentToken) return 0;
+  const payload = parseJwtPayload(currentToken);
+  return Number(payload?.sub) || 0;
+}
+
+function findUserReview(reviews) {
+  const uid = getCurrentUserId();
+  if (!uid || !Array.isArray(reviews)) return null;
+  return reviews.find((r) => Number(r.user_id) === uid) || null;
+}
+
 async function fetchJson(url, token) {
   const headers = { Accept: "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -101,22 +124,72 @@ function buildCategories(categories) {
   return categories.map(c => `<span class="detail-chip">${escapeHtml(categoryName(c))}</span>`).join("");
 }
 
-function buildReviews(reviews) {
+function buildReviews(reviews, currentUserId = 0) {
   if (!reviews?.length) {
     return `<p class="no-reviews">${escapeHtml(t("detail.noReviews"))}</p>`;
   }
-  return reviews.map(r => `
-    <div class="review-card">
-      <div class="review-header">
-        <div class="review-stars">${renderReviewStars(r.rating)}</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="review-rating-num">${r.rating}/5</span>
-          <span class="review-date">${formatDate(r.created_at)}</span>
+  return reviews.map((r) => {
+    const isMine = currentUserId && Number(r.user_id) === currentUserId;
+    return `
+    <div class="review-card${isMine ? " review-card-mine" : ""}">
+      <div class="review-avatar">${isMine ? escapeHtml(t("detail.yourReviewBadge")).charAt(0) : "U"}</div>
+      <div class="review-body">
+        <div class="review-header">
+          <div class="review-author-row">
+            <span class="review-author">${isMine ? escapeHtml(t("detail.yourReviewBadge")) : "User"}</span>
+            <span class="review-date">${formatDate(r.created_at)}</span>
+          </div>
+          <div class="review-meta">
+            <div class="review-stars">${renderReviewStars(r.rating)}</div>
+            <span class="review-rating-num">${r.rating}/5</span>
+          </div>
         </div>
+        ${r.comment ? `<p class="review-comment">${escapeHtml(r.comment)}</p>` : ""}
       </div>
-      ${r.comment ? `<p class="review-comment">${escapeHtml(r.comment)}</p>` : ""}
     </div>
-  `).join("");
+  `;
+  }).join("");
+}
+
+function buildReviewForm(item, userReview) {
+  const rating = Number(userReview?.rating) || 0;
+  const comment = String(userReview?.comment || "");
+  const isEditing = Boolean(userReview?.id);
+  const headingKey = isEditing ? "detail.updateReview" : "detail.writeReview";
+  const submitKey = isEditing ? "detail.updateReview" : "detail.submitReview";
+
+  const stars = Array.from({ length: 5 }, (_, i) => {
+    const value = i + 1;
+    const on = value <= rating;
+    return `<button type="button" class="review-star${on ? " star-on" : ""}" data-value="${value}" aria-label="${value}">${on ? "★" : "☆"}</button>`;
+  }).join("");
+
+  return `
+    <form class="review-form" id="reviewForm" data-item-id="${item.id}" data-review-id="${userReview?.id || ""}">
+      <div class="review-form-avatar">${escapeHtml(t("detail.yourReviewBadge")).charAt(0)}</div>
+      <div class="review-form-body">
+        <h3 class="review-form-title">${escapeHtml(t(headingKey))}</h3>
+
+        <div class="review-form-topline">
+          <span class="review-form-label">${escapeHtml(t("detail.yourRating"))}</span>
+          <div class="review-form-stars" id="reviewStars" role="group" aria-label="${escapeHtml(t("detail.yourRating"))}">
+            ${stars}
+          </div>
+        </div>
+
+        <label class="sr-only" for="reviewComment">${escapeHtml(t("detail.yourComment"))}</label>
+        <textarea id="reviewComment" name="comment" rows="2" maxlength="1000" placeholder="${escapeHtml(t("detail.commentPlaceholder"))}">${escapeHtml(comment)}</textarea>
+        <input type="hidden" id="reviewRating" name="rating" value="${rating}" />
+
+        <div class="review-form-actions">
+          ${isEditing ? `<button type="button" class="review-form-delete" id="reviewDeleteBtn">${escapeHtml(t("detail.deleteReview"))}</button>` : ""}
+          <button type="submit" class="review-form-submit" id="reviewSubmitBtn">${escapeHtml(t(submitKey))}</button>
+        </div>
+
+        <p class="review-form-msg" id="reviewFormMsg" hidden></p>
+      </div>
+    </form>
+  `;
 }
 
 function buildPage(item, reviews) {
@@ -126,7 +199,10 @@ function buildPage(item, reviews) {
   const contentLink = String(item.content_link || "").trim();
   const metaHtml = buildMeta(item);
   const cats = buildCategories(item.categories);
-  const reviewsHtml = buildReviews(reviews);
+  const currentUserId = getCurrentUserId();
+  const userReview = findUserReview(reviews);
+  const reviewsHtml = buildReviews(reviews, currentUserId);
+  const reviewFormHtml = buildReviewForm(item, userReview);
   const ratingVal = item.rating ? item.rating.toFixed(1) : "";
 
   return `
@@ -198,6 +274,7 @@ function buildPage(item, reviews) {
 
         <section class="detail-section">
           <h2 class="section-title">${escapeHtml(t("detail.reviews"))}</h2>
+          ${reviewFormHtml}
           <div class="reviews-grid">${reviewsHtml}</div>
         </section>
       </div>
@@ -326,6 +403,125 @@ function attachHandlers(item, reviews, token) {
       btn.disabled = false;
     }
   });
+
+  attachReviewForm(item, token);
+}
+
+function attachReviewForm(item, token) {
+  const form = document.getElementById("reviewForm");
+  if (!form) return;
+
+  const starsWrap = document.getElementById("reviewStars");
+  const ratingInput = document.getElementById("reviewRating");
+  const commentInput = document.getElementById("reviewComment");
+  const msgEl = document.getElementById("reviewFormMsg");
+  const submitBtn = document.getElementById("reviewSubmitBtn");
+  const deleteBtn = document.getElementById("reviewDeleteBtn");
+
+  const paintStars = (value) => {
+    const v = Number(value) || 0;
+    starsWrap?.querySelectorAll(".review-star").forEach((btn) => {
+      const bv = Number(btn.getAttribute("data-value"));
+      const on = bv <= v;
+      btn.classList.toggle("star-on", on);
+      btn.textContent = on ? "★" : "☆";
+    });
+  };
+
+  starsWrap?.querySelectorAll(".review-star").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const v = Number(btn.getAttribute("data-value"));
+      if (ratingInput) ratingInput.value = v;
+      paintStars(v);
+    });
+    btn.addEventListener("mouseenter", () => paintStars(btn.getAttribute("data-value")));
+  });
+  starsWrap?.addEventListener("mouseleave", () => paintStars(ratingInput?.value));
+
+  const showMsg = (text, isError = true) => {
+    if (!msgEl) return;
+    msgEl.textContent = text;
+    msgEl.classList.toggle("is-error", isError);
+    msgEl.classList.toggle("is-success", !isError);
+    msgEl.hidden = !text;
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const rating = Number(ratingInput?.value) || 0;
+    const comment = String(commentInput?.value || "").trim();
+
+    if (rating < 1 || rating > 5) {
+      showMsg(t("detail.ratingRequired"));
+      return;
+    }
+
+    const reviewId = form.getAttribute("data-review-id");
+    const isEditing = Boolean(reviewId);
+    const url = isEditing ? `/reviews/${reviewId}` : "/reviews";
+    const method = isEditing ? "PUT" : "POST";
+    const body = isEditing ? { rating, comment } : { item_id: item.id, rating, comment };
+
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = t("detail.saving");
+    showMsg("");
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showMsg(data?.msg || t("detail.reviewError"));
+        return;
+      }
+      await refreshReviews(item.id, token);
+    } catch {
+      showMsg(t("detail.reviewError"));
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
+
+  deleteBtn?.addEventListener("click", async () => {
+    const reviewId = form.getAttribute("data-review-id");
+    if (!reviewId) return;
+    if (!window.confirm(t("detail.confirmDelete"))) return;
+    deleteBtn.disabled = true;
+    try {
+      const res = await fetch(`/reviews/${reviewId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showMsg(data?.msg || t("detail.reviewError"));
+        deleteBtn.disabled = false;
+        return;
+      }
+      await refreshReviews(item.id, token);
+    } catch {
+      showMsg(t("detail.reviewError"));
+      deleteBtn.disabled = false;
+    }
+  });
+}
+
+async function refreshReviews(itemId, token) {
+  try {
+    const reviewsRes = await fetchJson(`/reviews/item/${itemId}`, token).catch(() => ({ reviews: [] }));
+    currentReviews = Array.isArray(reviewsRes?.reviews) ? reviewsRes.reviews : [];
+    rerender();
+  } catch {
+  }
 }
 
 let currentItem = null;
