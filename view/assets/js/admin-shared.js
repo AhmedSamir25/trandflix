@@ -194,6 +194,8 @@ const ADMIN_DRAWER_LINKS = [
   { href: "/pages/admin/create-item.html",    icon: "➕", labelKey: "admin.navCreateItem",  fallback: "Create Item" },
   { href: "/pages/admin/catalog.html",        icon: "📋", labelKey: "admin.navCatalog",     fallback: "All Items" },
   { href: "/pages/admin/banners.html",        icon: "🖼️", labelKey: "admin.navBanners",     fallback: "Banners" },
+  { href: "/pages/admin/communities.html",       icon: "👥", labelKey: "admin.navCommunities", fallback: "Communities", badge: true },
+  { href: "/pages/admin/review-communities.html", icon: "✅", labelKey: "admin.commReviewNav", fallback: "Review pending" },
 ];
 
 function injectAdminDrawer() {
@@ -201,9 +203,10 @@ function injectAdminDrawer() {
 
   const linksHtml = ADMIN_DRAWER_LINKS.map(
     (link) => `
-      <a class="admin-drawer-link" href="${link.href}">
+      <a class="admin-drawer-link${link.badge ? " admin-drawer-link-badge" : ""}" href="${link.href}">
         <span class="admin-drawer-icon">${link.icon}</span>
         <span data-i18n="${link.labelKey}">${escapeHtml(link.fallback)}</span>
+        ${link.badge ? `<span class="admin-drawer-count" data-pending-count hidden></span>` : ""}
       </a>
     `,
   ).join("");
@@ -302,4 +305,23 @@ function bindAdminDrawer() {
 window.addEventListener("DOMContentLoaded", () => {
   injectAdminDrawer();
   highlightActiveNav();
+  loadPendingCommunitiesCount();
 });
+
+async function loadPendingCommunitiesCount() {
+  const badges = document.querySelectorAll("[data-pending-count]");
+  if (!badges.length) return;
+
+  try {
+    const data = await fetchJson("/api/admin/communities/pending", { headers: authHeaders() });
+    const count = Number(data?.data?.total || 0);
+    badges.forEach((badge) => {
+      badge.hidden = count === 0;
+      badge.textContent = String(count);
+    });
+  } catch {
+    // Silently ignore: the badge simply stays hidden when the count is unavailable.
+  }
+}
+
+window.refreshPendingCommunitiesCount = loadPendingCommunitiesCount;

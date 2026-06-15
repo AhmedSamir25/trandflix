@@ -39,6 +39,17 @@ func RegisterCommunityRoutes(app *fiber.App) {
 	authCom.Post("/:id/join", communitiescontroller.Join(communitySvc))
 	authCom.Post("/:id/leave", communitiescontroller.Leave(communitySvc))
 
+	// Admin-only community moderation (approve / reject pending communities)
+	adminCom := api.Group("/admin/communities", middleware.Authenticate, middleware.RequireAdmin)
+	adminCom.Get("", communitiescontroller.AdminList(communitySvc))
+	adminCom.Get("/stats", communitiescontroller.Stats(communitySvc))
+	adminCom.Get("/pending", communitiescontroller.ListPending(communitySvc))
+	adminCom.Post("/:id/approve", communitiescontroller.Approve(communitySvc))
+	adminCom.Post("/:id/reject", communitiescontroller.Reject(communitySvc))
+	adminCom.Post("/:id/block", communitiescontroller.Block(communitySvc))
+	adminCom.Post("/:id/unblock", communitiescontroller.Unblock(communitySvc))
+	adminCom.Delete("/:id", communitiescontroller.AdminDelete(communitySvc))
+
 	// Posts (create under a community requires auth)
 	api.Post("/communities/:id/posts", middleware.Authenticate, postscontroller.Create(postSvc))
 

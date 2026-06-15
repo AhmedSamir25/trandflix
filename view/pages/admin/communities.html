@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.communitiesManagePageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Communities</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/admin-shared.js?v=communities-1"></script>
+    <script defer src="/assets/js/admin-communities-manage.js?v=communities-1"></script>
+  </head>
+  <body class="admin-page">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" data-i18n="admin.navCommunities">Communities</h1>
+          <p class="admin-subtitle" data-i18n="admin.communitiesManageSubtitle">Track, moderate and manage every community on TrendFlix.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/admin/review-communities.html" data-i18n="admin.communitiesReviewLink">Review pending</a>
+          <a class="ghost-link" href="/pages/app.html" data-i18n="admin.backToApp">Back to app</a>
+          <button class="text-btn" id="refreshCommunitiesBtn" type="button" data-i18n="admin.refresh">Refresh</button>
+        </div>
+      </header>
+
+      <p id="pageError" class="notice error-notice" hidden></p>
+      <p id="pageNotice" class="notice success-notice" hidden></p>
+
+      <section class="stats-grid" aria-label="Community statistics">
+        <article class="stat-card stat-total" style="--stat-color:#7c3aed">
+          <span class="stat-icon">▦</span>
+          <span class="stat-label" data-i18n="admin.commStatTotal">Total communities</span>
+          <strong id="statTotal">-</strong>
+          <small data-i18n="admin.commStatTotalHint">All communities created</small>
+        </article>
+        <article class="stat-card" style="--stat-color:#16a34a">
+          <span class="stat-icon">✓</span>
+          <span class="stat-label" data-i18n="admin.commStatApproved">Active</span>
+          <strong id="statApproved">-</strong>
+          <small data-i18n="admin.commStatApprovedHint">Visible to everyone</small>
+        </article>
+        <article class="stat-card" style="--stat-color:#b7791f">
+          <span class="stat-icon">⏳</span>
+          <span class="stat-label" data-i18n="admin.commStatPending">Pending</span>
+          <strong id="statPending">-</strong>
+          <small data-i18n="admin.commStatPendingHint">Waiting for review</small>
+        </article>
+        <article class="stat-card" style="--stat-color:#d90416">
+          <span class="stat-icon">⊘</span>
+          <span class="stat-label" data-i18n="admin.commStatBlocked">Blocked</span>
+          <strong id="statBlocked">-</strong>
+          <small data-i18n="admin.commStatBlockedHint">Hidden / rejected</small>
+        </article>
+      </section>
+
+      <section class="card panel">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-kicker" data-i18n="admin.commByTypeKicker">Breakdown</p>
+            <h2 data-i18n="admin.commByTypeTitle">Communities by type</h2>
+          </div>
+          <span class="info-tag" id="membersSumBadge" hidden></span>
+        </div>
+        <div id="typeBars" class="type-bars"></div>
+      </section>
+
+      <section class="card panel">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-kicker" data-i18n="admin.commManageKicker">Management</p>
+            <h2 data-i18n="admin.commManageTitle">All communities</h2>
+          </div>
+          <span class="info-tag" id="communitiesCountBadge" hidden></span>
+        </div>
+
+        <div class="comm-toolbar">
+          <div class="comm-search">
+            <input id="commSearch" type="search" autocomplete="off" data-i18n-placeholder="admin.commSearchPlaceholder" placeholder="Search by name or description…" />
+          </div>
+          <div class="comm-filter-group" id="statusFilters">
+            <button class="filter-btn active" type="button" data-status="" data-i18n="app.all">All</button>
+            <button class="filter-btn" type="button" data-status="approved" data-i18n="admin.commStatusApproved">Active</button>
+            <button class="filter-btn" type="button" data-status="pending" data-i18n="admin.commStatusPending">Pending</button>
+            <button class="filter-btn" type="button" data-status="rejected" data-i18n="admin.commStatusRejected">Blocked</button>
+          </div>
+          <div class="comm-filter-group" id="typeFilters">
+            <button class="filter-btn active" type="button" data-type="">🎬📺📚🎮✨</button>
+            <button class="filter-btn" type="button" data-type="movies">🎬</button>
+            <button class="filter-btn" type="button" data-type="series">📺</button>
+            <button class="filter-btn" type="button" data-type="books">📚</button>
+            <button class="filter-btn" type="button" data-type="games">🎮</button>
+            <button class="filter-btn" type="button" data-type="mixed">✨</button>
+          </div>
+        </div>
+
+        <div class="comm-table-wrap">
+          <table class="comm-table">
+            <thead>
+              <tr>
+                <th data-i18n="admin.commColCommunity">Community</th>
+                <th data-i18n="admin.commColType">Type</th>
+                <th data-i18n="admin.commColOwner">Owner</th>
+                <th data-i18n="admin.commColMembers">Members</th>
+                <th data-i18n="admin.commColStatus">Status</th>
+                <th data-i18n="admin.commColCreated">Created</th>
+                <th data-i18n="admin.commColActions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="communitiesTableBody"></tbody>
+          </table>
+          <p id="communitiesEmpty" class="notice" hidden data-i18n="admin.commEmpty">No communities found.</p>
+        </div>
+
+        <div class="comm-pagination" id="commPagination"></div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -35,6 +35,75 @@ func List(svc *communities.Service) fiber.Handler {
 	}
 }
 
+func AdminList(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		search := strings.TrimSpace(c.Query("q"))
+		status := strings.TrimSpace(c.Query("status"))
+		categoryType := strings.TrimSpace(c.Query("category_type"))
+		page, perPage := parsePage(c)
+
+		result, err := svc.ListAll(search, status, categoryType, page, perPage)
+		if err != nil {
+			return httpx.Error(c, fiber.StatusInternalServerError, "Failed to fetch communities")
+		}
+		return httpx.Success(c, fiber.StatusOK, "Communities fetched successfully", fiber.Map{
+			"communities": result.Items,
+			"total":       result.Total,
+			"page":        result.Page,
+			"pages":       result.Pages,
+		})
+	}
+}
+
+func Stats(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		stats, err := svc.Stats()
+		if err != nil {
+			return httpx.Error(c, fiber.StatusInternalServerError, "Failed to fetch community stats")
+		}
+		return httpx.SuccessData(c, fiber.StatusOK, "Community stats fetched successfully", "stats", stats)
+	}
+}
+
+func AdminDelete(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id, err := strconv.ParseUint(strings.TrimSpace(c.Params("id")), 10, 64)
+		if err != nil || id == 0 {
+			return httpx.Error(c, fiber.StatusBadRequest, "Invalid community id")
+		}
+
+		if err := svc.AdminDelete(uint(id)); err != nil {
+			return mapCommunityError(c, err)
+		}
+		return httpx.Success(c, fiber.StatusOK, "Community deleted successfully", nil)
+	}
+}
+
+func Block(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		return setAdminStatus(c, svc, communities.StatusRejected)
+	}
+}
+
+func Unblock(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		return setAdminStatus(c, svc, communities.StatusApproved)
+	}
+}
+
+func setAdminStatus(c *fiber.Ctx, svc *communities.Service, status string) error {
+	id, err := strconv.ParseUint(strings.TrimSpace(c.Params("id")), 10, 64)
+	if err != nil || id == 0 {
+		return httpx.Error(c, fiber.StatusBadRequest, "Invalid community id")
+	}
+
+	community, err := svc.SetStatus(uint(id), status)
+	if err != nil {
+		return mapCommunityError(c, err)
+	}
+	return httpx.SuccessData(c, fiber.StatusOK, "Community status updated", "community", community)
+}
+
 func Popular(svc *communities.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		limit, _ := strconv.Atoi(strings.TrimSpace(c.Query("limit")))
@@ -209,6 +278,52 @@ func Members(svc *communities.Service) fiber.Handler {
 	}
 }
 
+func ListPending(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		page, perPage := parsePage(c)
+		result, err := svc.ListPending(page, perPage)
+		if err != nil {
+			return httpx.Error(c, fiber.StatusInternalServerError, "Failed to fetch pending communities")
+		}
+		return httpx.Success(c, fiber.StatusOK, "Pending communities fetched successfully", fiber.Map{
+			"communities": result.Items,
+			"total":       result.Total,
+			"page":        result.Page,
+			"pages":       result.Pages,
+		})
+	}
+}
+
+func Approve(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id, err := strconv.ParseUint(strings.TrimSpace(c.Params("id")), 10, 64)
+		if err != nil || id == 0 {
+			return httpx.Error(c, fiber.StatusBadRequest, "Invalid community id")
+		}
+
+		community, err := svc.SetStatus(uint(id), communities.StatusApproved)
+		if err != nil {
+			return mapCommunityError(c, err)
+		}
+		return httpx.SuccessData(c, fiber.StatusOK, "Community approved successfully", "community", community)
+	}
+}
+
+func Reject(svc *communities.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id, err := strconv.ParseUint(strings.TrimSpace(c.Params("id")), 10, 64)
+		if err != nil || id == 0 {
+			return httpx.Error(c, fiber.StatusBadRequest, "Invalid community id")
+		}
+
+		community, err := svc.SetStatus(uint(id), communities.StatusRejected)
+		if err != nil {
+			return mapCommunityError(c, err)
+		}
+		return httpx.SuccessData(c, fiber.StatusOK, "Community rejected successfully", "community", community)
+	}
+}
+
 func mapCommunityError(c *fiber.Ctx, err error) error {
 	switch {
 	case errors.Is(err, communities.ErrNotFound):
@@ -217,6 +332,8 @@ func mapCommunityError(c *fiber.Ctx, err error) error {
 		return httpx.ValidationError(c, "Name is required", fiber.Map{"name": "name is required"})
 	case errors.Is(err, communities.ErrInvalidCategory):
 		return httpx.ValidationError(c, "Invalid category type", fiber.Map{"category_type": "must be one of: movies, series, books, games, mixed"})
+	case errors.Is(err, communities.ErrInvalidStatus):
+		return httpx.Error(c, fiber.StatusBadRequest, "Invalid community status")
 	case errors.Is(err, communities.ErrSlugTaken):
 		return httpx.Error(c, fiber.StatusConflict, "A community with that slug already exists")
 	case errors.Is(err, communities.ErrAlreadyMember):

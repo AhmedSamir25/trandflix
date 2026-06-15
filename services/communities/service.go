@@ -17,6 +17,7 @@ var (
 	ErrSlugTaken          = errors.New("slug is already taken")
 	ErrInvalidName        = errors.New("name is required")
 	ErrInvalidCategory    = errors.New("invalid category type")
+	ErrInvalidStatus      = errors.New("invalid community status")
 	ErrAlreadyMember      = errors.New("you are already a member of this community")
 	ErrNotMember          = errors.New("you are not a member of this community")
 	ErrBanned             = errors.New("you are banned from this community")
@@ -31,6 +32,12 @@ var validCategories = map[string]bool{
 	models.CategoryTypeGames:  true,
 	models.CategoryTypeMixed:  true,
 }
+
+const (
+	StatusPending  = models.CommunityStatusPending
+	StatusApproved = models.CommunityStatusApproved
+	StatusRejected = models.CommunityStatusRejected
+)
 
 const maxCommunitiesPerDay = 3
 
@@ -51,6 +58,61 @@ type ListResult struct {
 	Total int64              `json:"total"`
 	Page  int                `json:"page"`
 	Pages int                `json:"pages"`
+}
+
+type StatsResult struct {
+	Total       int64                          `json:"total"`
+	MembersSum  int64                          `json:"members_sum"`
+	ByType      []repositories.CategoryTypeCount `json:"by_type"`
+	ByStatus    []repositories.StatusCount       `json:"by_status"`
+}
+
+func (s *Service) Stats() (*StatsResult, error) {
+	total, err := s.communities.Count()
+	if err != nil {
+		return nil, err
+	}
+	membersSum, err := s.communities.SumMembers()
+	if err != nil {
+		return nil, err
+	}
+	byType, err := s.communities.CountByCategoryType()
+	if err != nil {
+		return nil, err
+	}
+	byStatus, err := s.communities.CountGroupByStatus()
+	if err != nil {
+		return nil, err
+	}
+	return &StatsResult{Total: total, MembersSum: membersSum, ByType: byType, ByStatus: byStatus}, nil
+}
+
+func (s *Service) ListAll(search, status, categoryType string, page, perPage int) (*ListResult, error) {
+	if page < 1 {
+		page = 1
+	}
+	if perPage < 1 || perPage > 100 {
+		perPage = 20
+	}
+	offset := (page - 1) * perPage
+
+	items, total, err := s.communities.ListAll(search, status, categoryType, perPage, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	pages := int((total + int64(perPage) - 1) / int64(perPage))
+	return &ListResult{Items: items, Total: total, Page: page, Pages: pages}, nil
+}
+
+func (s *Service) AdminDelete(id uint) error {
+	if _, err := s.communities.GetByID(id); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrNotFound
+		}
+		return err
+	}
+	return s.communities.DeleteByID(id)
 }
 
 type CreateInput struct {
@@ -120,6 +182,53 @@ func (s *Service) GetByID(id uint) (*models.Community, error) {
 	return community, nil
 }
 
+func (s *Service) ListPending(page, perPage int) (*ListResult, error) {
+	if page < 1 {
+		page = 1
+	}
+	if perPage < 1 || perPage > 50 {
+		perPage = 20
+	}
+	offset := (page - 1) * perPage
+
+	items, total, err := s.communities.ListByStatus(models.CommunityStatusPending, perPage, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	pages := int((total + int64(perPage) - 1) / int64(perPage))
+	return &ListResult{Items: items, Total: total, Page: page, Pages: pages}, nil
+}
+
+func (s *Service) CountPending() (int64, error) {
+	return s.communities.CountByStatus(models.CommunityStatusPending)
+}
+
+func (s *Service) SetStatus(id uint, status string) (*models.Community, error) {
+	if status != models.CommunityStatusApproved && status != models.CommunityStatusRejected && status != models.CommunityStatusPending {
+		return nil, ErrInvalidStatus
+	}
+
+	community, err := s.communities.GetByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+
+	if community.Status == status {
+		return community, nil
+	}
+
+	if err := s.communities.SetStatus(community.ID, status); err != nil {
+		return nil, err
+	}
+
+	community.Status = status
+	return community, nil
+}
+
 func (s *Service) Create(userID uint, input CreateInput) (*models.Community, error) {
 	name := strings.TrimSpace(input.Name)
 	if name == "" {
@@ -157,6 +266,7 @@ func (s *Service) Create(userID uint, input CreateInput) (*models.Community, err
 		CreatedBy:    userID,
 		Rules:        strings.TrimSpace(input.Rules),
 		IsPrivate:    input.IsPrivate,
+		Status:       models.CommunityStatusPending,
 		MembersCount: 1,
 	}
 

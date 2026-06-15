@@ -8,6 +8,10 @@ const (
 	CategoryTypeBooks  = "books"
 	CategoryTypeGames  = "games"
 	CategoryTypeMixed  = "mixed"
+
+	CommunityStatusPending  = "pending"
+	CommunityStatusApproved = "approved"
+	CommunityStatusRejected = "rejected"
 )
 
 type Community struct {
@@ -22,6 +26,7 @@ type Community struct {
 	User         User      `gorm:"foreignKey:CreatedBy;references:ID" json:"user,omitempty"`
 	Rules        string    `gorm:"column:rules;type:text" json:"rules"`
 	IsPrivate    bool      `gorm:"column:is_private;default:false" json:"is_private"`
+	Status       string    `gorm:"column:status;type:varchar(50);not null;default:approved;index" json:"status"`
 	MembersCount int       `gorm:"column:members_count;default:0" json:"members_count"`
 	PostsCount   int       `gorm:"column:posts_count;default:0" json:"posts_count"`
 	CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime" json:"created_at"`

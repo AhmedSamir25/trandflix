@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.communitiesPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Communities</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/admin-shared.js?v=communities-1"></script>
+    <script defer src="/assets/js/admin-communities.js?v=communities-1"></script>
+  </head>
+  <body class="admin-page">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" data-i18n="admin.navCommunities">Communities</h1>
+          <p class="admin-subtitle" data-i18n="admin.communitiesSubtitle">Review communities created by users. Approve or reject the ones waiting for moderation.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/app.html" data-i18n="admin.backToApp">Back to app</a>
+          <button class="text-btn" id="refreshCommunitiesBtn" type="button" data-i18n="admin.refresh">Refresh</button>
+        </div>
+      </header>
+
+      <p id="pageError" class="notice error-notice" hidden></p>
+
+      <section class="card panel">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-kicker" data-i18n="admin.communitiesPendingKicker">Moderation</p>
+            <h2 data-i18n="admin.communitiesPendingTitle">Communities pending approval</h2>
+          </div>
+          <span class="info-tag" id="pendingCountBadge" hidden></span>
+        </div>
+        <div id="communitiesList" class="item-list"></div>
+      </section>
+    </main>
+  </body>
+</html>
