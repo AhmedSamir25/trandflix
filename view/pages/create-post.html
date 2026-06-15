@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="communities.createPostPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · New Post</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/communities.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/communities-api.js"></script>
+    <script defer src="/assets/js/create-post.js"></script>
+  </head>
+  <body>
+    <div class="comm-shell">
+      <nav class="comm-topbar">
+        <a class="comm-back" id="backLink" href="/pages/communities.html" data-i18n="communities.back">← Back</a>
+        <span class="comm-brand">TrendFlix</span>
+        <div class="lang-menu">
+          <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+          <div class="lang-menu-list" data-lang-menu>
+            <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+            <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+          </div>
+        </div>
+      </nav>
+
+      <header class="comm-hero">
+        <h1 data-i18n="communities.cpHeading">New Post</h1>
+        <p class="comm-subtitle" id="subtitle" data-i18n="communities.cpLoadingCommunity">Loading community...</p>
+      </header>
+
+      <form id="postForm" class="comm-form" autocomplete="off">
+        <div class="comm-field">
+          <label for="title" data-i18n="communities.cpTitleLabel">Title *</label>
+          <input id="title" name="title" type="text" data-i18n-placeholder="communities.cpTitlePlaceholder" placeholder="Start a discussion..." required />
+        </div>
+
+        <div class="comm-row">
+          <div class="comm-field">
+            <label for="post_type" data-i18n="communities.cpPostTypeLabel">Post type</label>
+            <select id="post_type" name="post_type">
+              <option value="discussion" data-i18n="communities.typeDiscussion">💬 Discussion</option>
+              <option value="review" data-i18n="communities.typeReview">⭐ Review</option>
+              <option value="poll" data-i18n="communities.typePoll">📊 Poll</option>
+              <option value="recommendation_request" data-i18n="communities.typeRecommendation">🎁 Recommendation Request</option>
+            </select>
+          </div>
+          <div class="comm-field">
+            <label for="related_item_type" data-i18n="communities.cpRelatedTypeLabel">Related item type</label>
+            <select id="related_item_type" name="related_item_type">
+              <option value="" data-i18n="communities.relNone">— None —</option>
+              <option value="movie" data-i18n="communities.relMovie">🎬 Movie</option>
+              <option value="series" data-i18n="communities.relSeries">📺 Series</option>
+              <option value="book" data-i18n="communities.relBook">📚 Book</option>
+              <option value="game" data-i18n="communities.relGame">🎮 Game</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="comm-field">
+          <label for="body" data-i18n="communities.cpBodyLabel">Body</label>
+          <textarea id="body" name="body" data-i18n-placeholder="communities.cpBodyPlaceholder" placeholder="Write your post..."></textarea>
+        </div>
+
+        <label class="comm-checkbox">
+          <input id="is_spoiler" name="is_spoiler" type="checkbox" />
+          <span data-i18n="communities.cpContainsSpoilers">Contains spoilers</span>
+        </label>
+
+        <p class="comm-form-msg" id="formMsg" hidden></p>
+
+        <div>
+          <button type="submit" class="comm-btn comm-btn-primary" id="submitBtn" data-i18n="communities.cpPublishBtn">Publish Post</button>
+          <a id="cancelLink" href="#" class="comm-btn comm-btn-ghost" data-i18n="communities.cancel">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

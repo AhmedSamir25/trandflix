@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="communities.createCommunityPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Create Community</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/communities.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/communities-api.js"></script>
+    <script defer src="/assets/js/create-community.js"></script>
+  </head>
+  <body>
+    <div class="comm-shell">
+      <nav class="comm-topbar">
+        <a class="comm-back" href="/pages/communities.html" data-i18n="communities.backToCommunities">← Back to Communities</a>
+        <span class="comm-brand">TrendFlix</span>
+        <div class="lang-menu">
+          <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+          <div class="lang-menu-list" data-lang-menu>
+            <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+            <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+          </div>
+        </div>
+      </nav>
+
+      <header class="comm-hero">
+        <h1 data-i18n="communities.ccHeading">Create a Community</h1>
+        <p class="comm-subtitle" data-i18n="communities.ccSubtitle">Start a club for fans of a movie, series, book, or game.</p>
+      </header>
+
+      <form id="createForm" class="comm-form" autocomplete="off">
+        <div class="comm-field">
+          <label for="name" data-i18n="communities.ccNameLabel">Name *</label>
+          <input id="name" name="name" type="text" data-i18n-placeholder="communities.ccNamePlaceholder" placeholder="e.g. Horror Movies Community" required />
+        </div>
+
+        <div class="comm-row">
+          <div class="comm-field">
+            <label for="category_type" data-i18n="communities.ccCategoryLabel">Category *</label>
+            <select id="category_type" name="category_type" required>
+              <option value="movies" data-i18n="communities.catMovies">🎬 Movies</option>
+              <option value="series" data-i18n="communities.catSeries">📺 Series</option>
+              <option value="books" data-i18n="communities.catBooks">📚 Books</option>
+              <option value="games" data-i18n="communities.catGames">🎮 Games</option>
+              <option value="mixed" data-i18n="communities.catMixed">✨ Mixed</option>
+            </select>
+          </div>
+          <div class="comm-field">
+            <label for="avatar_image" data-i18n="communities.ccAvatarLabel">Avatar image URL</label>
+            <input id="avatar_image" name="avatar_image" type="url" placeholder="https://..." />
+          </div>
+        </div>
+
+        <div class="comm-field">
+          <label for="cover_image" data-i18n="communities.ccCoverLabel">Cover image URL</label>
+          <input id="cover_image" name="cover_image" type="url" placeholder="https://..." />
+        </div>
+
+        <div class="comm-field">
+          <label for="description" data-i18n="communities.ccDescriptionLabel">Description</label>
+          <textarea id="description" name="description" data-i18n-placeholder="communities.ccDescriptionPlaceholder" placeholder="What is this community about?"></textarea>
+        </div>
+
+        <div class="comm-field">
+          <label for="rules" data-i18n="communities.ccRulesLabel">Rules</label>
+          <textarea id="rules" name="rules" data-i18n-placeholder="communities.ccRulesPlaceholder" placeholder="One rule per line."></textarea>
+          <span class="comm-field-hint" data-i18n="communities.ccRulesHint">Optional. Separate each rule on a new line.</span>
+        </div>
+
+        <label class="comm-checkbox">
+          <input id="is_private" name="is_private" type="checkbox" />
+          <span data-i18n="communities.ccPrivate">Private community (hidden from public lists later)</span>
+        </label>
+
+        <p class="comm-form-msg" id="formMsg" hidden></p>
+
+        <div>
+          <button type="submit" class="comm-btn comm-btn-primary" id="submitBtn" data-i18n="communities.ccCreateBtn">Create Community</button>
+          <a href="/pages/communities.html" class="comm-btn comm-btn-ghost" data-i18n="communities.cancel">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="communities.postPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Post</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/communities.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/communities-api.js"></script>
+    <script defer src="/assets/js/post.js"></script>
+  </head>
+  <body>
+    <div class="comm-shell">
+      <nav class="comm-topbar">
+        <a class="comm-back" id="backLink" href="/pages/communities.html" data-i18n="communities.communitiesLink">← Communities</a>
+        <span class="comm-brand">TrendFlix</span>
+        <div class="lang-menu">
+          <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+          <div class="lang-menu-list" data-lang-menu>
+            <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+            <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+          </div>
+        </div>
+      </nav>
+
+      <div id="postRoot">
+        <p class="comm-status" data-i18n="communities.pLoading">Loading post...</p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -29,6 +29,22 @@ func RegisterViewRoutes(app *fiber.App) {
 		return c.SendFile(filepath.Join(viewDir, "pages", "detail.html"))
 	})
 
+	app.Get("/communities", func(c *fiber.Ctx) error {
+		return c.SendFile(filepath.Join(viewDir, "pages", "communities.html"))
+	})
+	app.Get("/community", func(c *fiber.Ctx) error {
+		return c.SendFile(filepath.Join(viewDir, "pages", "community.html"))
+	})
+	app.Get("/create-community", func(c *fiber.Ctx) error {
+		return c.SendFile(filepath.Join(viewDir, "pages", "create-community.html"))
+	})
+	app.Get("/create-post", func(c *fiber.Ctx) error {
+		return c.SendFile(filepath.Join(viewDir, "pages", "create-post.html"))
+	})
+	app.Get("/post", func(c *fiber.Ctx) error {
+		return c.SendFile(filepath.Join(viewDir, "pages", "post.html"))
+	})
+
 	app.Static("/assets", filepath.Join(viewDir, "assets"))
 	app.Static("/pages", filepath.Join(viewDir, "pages"))
 }

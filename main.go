@@ -34,6 +34,7 @@ func main() {
 	routers.RegisterListRoutes(app)
 	routers.RegisterRecommendationRoutes(app)
 	routers.RegisterAIAssistantRoutes(app)
+	routers.RegisterCommunityRoutes(app)
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {
