@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	admincontroller "trendflix/controller/admin_controller"
+	subscriptionplancontroller "trendflix/controller/subscription_plan_controller"
 	"trendflix/middleware"
 )
 
@@ -14,4 +15,6 @@ func RegisterAdminRoutes(app *fiber.App) {
 	admin.Get("/stats/types", admincontroller.GetTypeStats)
 	admin.Get("/stats/categories", admincontroller.GetCategoryStats)
 	admin.Get("/stats/users", admincontroller.GetUserStats)
+	admin.Get("/subscription-plan", subscriptionplancontroller.GetPlan)
+	admin.Put("/subscription-plan", subscriptionplancontroller.UpdatePlan)
 }

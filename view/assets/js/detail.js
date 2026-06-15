@@ -307,10 +307,37 @@ function attachHandlers(item, reviews, token) {
     }
   });
 
-  document.getElementById("actionBtn")?.addEventListener("click", () => {
+  document.getElementById("actionBtn")?.addEventListener("click", async () => {
     const contentLink = String(item.content_link || "").trim();
     if (!contentLink) return;
-    window.open(contentLink, "_blank", "noopener,noreferrer");
+
+    const btn = document.getElementById("actionBtn");
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "...";
+
+    try {
+      const res = await fetch(`/items/${item.id}/access`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const accessLink = String(data?.content_link || "").trim();
+        if (accessLink) {
+          window.open(accessLink, "_blank", "noopener,noreferrer");
+        }
+      } else if (res.status === 402) {
+        alert(t("detail.subscriptionRequired"));
+        window.location.href = "/pages/subscription.html";
+      } else {
+        alert(data?.msg || t("detail.accessFailed"));
+      }
+    } catch {
+      alert(t("detail.accessFailed"));
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
   });
 
   const favBtn = document.getElementById("favBtn");

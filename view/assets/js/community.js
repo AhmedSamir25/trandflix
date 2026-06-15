@@ -14,6 +14,14 @@ function renderHeader() {
   const avatar = commAvatarUrl(c);
 
   root.innerHTML = `
+    ${c.status === "pending" ? `
+      <div class="comm-review-banner">
+        <span class="comm-review-icon">⏳</span>
+        <div class="comm-review-text">
+          <strong>${commEscapeHtml(commT("communities.dPendingBadge"))}</strong>
+          <span>${commEscapeHtml(commT("communities.dUnderReview"))}</span>
+        </div>
+      </div>` : ""}
     <div class="comm-detail-cover">
       <img src="${commEscapeHtml(cover)}" alt="" />
     </div>

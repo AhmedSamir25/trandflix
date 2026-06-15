@@ -31,50 +31,51 @@
         <div class="admin-actions">
           <a class="ghost-link" href="/pages/admin/review-communities.html" data-i18n="admin.communitiesReviewLink">Review pending</a>
           <a class="ghost-link" href="/pages/app.html" data-i18n="admin.backToApp">Back to app</a>
-          <button class="text-btn" id="refreshCommunitiesBtn" type="button" data-i18n="admin.refresh">Refresh</button>
         </div>
       </header>
 
       <p id="pageError" class="notice error-notice" hidden></p>
       <p id="pageNotice" class="notice success-notice" hidden></p>
 
-      <section class="stats-grid" aria-label="Community statistics">
-        <article class="stat-card stat-total" style="--stat-color:#7c3aed">
-          <span class="stat-icon">▦</span>
-          <span class="stat-label" data-i18n="admin.commStatTotal">Total communities</span>
-          <strong id="statTotal">-</strong>
-          <small data-i18n="admin.commStatTotalHint">All communities created</small>
-        </article>
-        <article class="stat-card" style="--stat-color:#16a34a">
-          <span class="stat-icon">✓</span>
-          <span class="stat-label" data-i18n="admin.commStatApproved">Active</span>
-          <strong id="statApproved">-</strong>
-          <small data-i18n="admin.commStatApprovedHint">Visible to everyone</small>
-        </article>
-        <article class="stat-card" style="--stat-color:#b7791f">
-          <span class="stat-icon">⏳</span>
-          <span class="stat-label" data-i18n="admin.commStatPending">Pending</span>
-          <strong id="statPending">-</strong>
-          <small data-i18n="admin.commStatPendingHint">Waiting for review</small>
-        </article>
-        <article class="stat-card" style="--stat-color:#d90416">
-          <span class="stat-icon">⊘</span>
-          <span class="stat-label" data-i18n="admin.commStatBlocked">Blocked</span>
-          <strong id="statBlocked">-</strong>
-          <small data-i18n="admin.commStatBlockedHint">Hidden / rejected</small>
-        </article>
-      </section>
+      <div class="comm-overview">
+        <section class="stats-grid" aria-label="Community statistics">
+          <article class="stat-card stat-total" style="--stat-color:#7c3aed">
+            <span class="stat-icon">▦</span>
+            <span class="stat-label" data-i18n="admin.commStatTotal">Total communities</span>
+            <strong id="statTotal">-</strong>
+            <small data-i18n="admin.commStatTotalHint">All communities created</small>
+          </article>
+          <article class="stat-card" style="--stat-color:#16a34a">
+            <span class="stat-icon">✓</span>
+            <span class="stat-label" data-i18n="admin.commStatApproved">Active</span>
+            <strong id="statApproved">-</strong>
+            <small data-i18n="admin.commStatApprovedHint">Visible to everyone</small>
+          </article>
+          <article class="stat-card" style="--stat-color:#b7791f">
+            <span class="stat-icon">⏳</span>
+            <span class="stat-label" data-i18n="admin.commStatPending">Pending</span>
+            <strong id="statPending">-</strong>
+            <small data-i18n="admin.commStatPendingHint">Waiting for review</small>
+          </article>
+          <article class="stat-card" style="--stat-color:#d90416">
+            <span class="stat-icon">⊘</span>
+            <span class="stat-label" data-i18n="admin.commStatBlocked">Blocked</span>
+            <strong id="statBlocked">-</strong>
+            <small data-i18n="admin.commStatBlockedHint">Hidden / rejected</small>
+          </article>
+        </section>
 
-      <section class="card panel">
-        <div class="panel-heading">
-          <div>
-            <p class="panel-kicker" data-i18n="admin.commByTypeKicker">Breakdown</p>
-            <h2 data-i18n="admin.commByTypeTitle">Communities by type</h2>
+        <section class="card panel comm-breakdown-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.commByTypeKicker">Breakdown</p>
+              <h2 data-i18n="admin.commByTypeTitle">Communities by type</h2>
+            </div>
+            <span class="info-tag" id="membersSumBadge" hidden></span>
           </div>
-          <span class="info-tag" id="membersSumBadge" hidden></span>
-        </div>
-        <div id="typeBars" class="type-bars"></div>
-      </section>
+          <div id="typeBars" class="type-bars"></div>
+        </section>
+      </div>
 
       <section class="card panel">
         <div class="panel-heading">

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="subscription.pageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Subscription</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/auth.css" />
+    <link rel="stylesheet" href="/assets/css/subscription.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/subscription.js"></script>
+  </head>
+  <body class="page-center">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="card subscription-card" id="subscriptionRoot">
+      <div id="loadingState">
+        <h1 class="brand">TrendFlix</h1>
+        <div class="spinner"></div>
+        <p data-i18n="subscription.loading">Loading subscription info...</p>
+      </div>
+    </main>
+  </body>
+</html>

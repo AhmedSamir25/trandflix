@@ -22,7 +22,12 @@ func List(svc *communities.Service) fiber.Handler {
 		search := strings.TrimSpace(c.Query("q"))
 		page, perPage := parsePage(c)
 
-		result, err := svc.List(search, page, perPage)
+		var userID uint
+		if user, ok := httpx.CurrentUser(c); ok {
+			userID = user.ID
+		}
+
+		result, err := svc.List(search, page, perPage, userID)
 		if err != nil {
 			return httpx.Error(c, fiber.StatusInternalServerError, "Failed to fetch communities")
 		}

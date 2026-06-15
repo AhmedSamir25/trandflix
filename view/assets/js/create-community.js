@@ -6,6 +6,23 @@ function showFormMsg(message, ok) {
   el.className = "comm-form-msg " + (ok ? "ok" : "err");
 }
 
+function showPendingReview(community) {
+  const el = document.getElementById("formMsg");
+  if (!el) return;
+  const slug = community?.slug || "";
+  const viewLink = slug
+    ? `/pages/community.html?slug=${encodeURIComponent(slug)}`
+    : "/pages/communities.html";
+  el.hidden = false;
+  el.className = "comm-form-msg comm-review-notice";
+  el.innerHTML = `
+    <strong>⏳ ${commEscapeHtml(commT("communities.ccCreated"))}</strong>
+    <span>${commEscapeHtml(commT("communities.ccPendingReview"))}</span>
+    <a class="comm-btn comm-btn-primary" href="${viewLink}">${commEscapeHtml(commT("communities.ccViewCommunity"))}</a>
+  `;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   if (commRedirectIfUnauth()) return;
 
@@ -34,11 +51,7 @@ window.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(payload),
       });
       const community = res?.data?.community;
-      if (community?.slug) {
-        window.location.href = `/pages/community.html?slug=${encodeURIComponent(community.slug)}`;
-      } else {
-        showFormMsg(commT("communities.ccCreated"), true);
-      }
+      showPendingReview(community);
     } catch (err) {
       showFormMsg(err.message || commT("communities.ccFailed"), false);
       btn.disabled = false;

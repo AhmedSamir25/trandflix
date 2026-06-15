@@ -12,6 +12,9 @@ func RegisterItemRoutes(app *fiber.App) {
 	items.Get("", itemcontroller.GetItems)
 	items.Get("/:id", itemcontroller.GetItemByID)
 
+	authItems := app.Group("/items", middleware.Authenticate)
+	authItems.Get("/:id/access", itemcontroller.GetItemAccess)
+
 	adminItems := app.Group("/items", middleware.Authenticate, middleware.RequireAdmin)
 	adminItems.Post("", itemcontroller.CreateItem)
 	adminItems.Put("/:id", itemcontroller.UpdateItem)

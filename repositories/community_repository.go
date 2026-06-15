@@ -15,8 +15,13 @@ func NewCommunityRepository(db *gorm.DB) *CommunityRepository {
 	return &CommunityRepository{db: db}
 }
 
-func (r *CommunityRepository) List(search string, limit, offset int) ([]models.Community, int64, error) {
-	query := r.db.Model(&models.Community{}).Where("status = ?", models.CommunityStatusApproved)
+func (r *CommunityRepository) List(search string, limit, offset int, userID uint) ([]models.Community, int64, error) {
+	query := r.db.Model(&models.Community{})
+	if userID > 0 {
+		query = query.Where("status = ? OR (status = ? AND created_by = ?)", models.CommunityStatusApproved, models.CommunityStatusPending, userID)
+	} else {
+		query = query.Where("status = ?", models.CommunityStatusApproved)
+	}
 	if search != "" {
 		like := "%" + search + "%"
 		query = query.Where("name LIKE ? OR description LIKE ?", like, like)

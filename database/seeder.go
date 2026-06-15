@@ -158,6 +158,36 @@ func SeedCategories() {
 	log.Printf("category seed: ensured %d default categories", len(defaultCategories))
 }
 
+func SeedSubscriptionPlan() {
+	if DbConn == nil {
+		panic("database is not connected")
+	}
+
+	var count int64
+	if err := DbConn.Model(&models.SubscriptionPlan{}).Count(&count).Error; err != nil {
+		panic(fmt.Sprintf("subscription plan seed count failed: %v", err))
+	}
+
+	if count > 0 {
+		log.Printf("subscription plan seed: skipped because %d plans already exist", count)
+		return
+	}
+
+	plan := models.SubscriptionPlan{
+		Name:              "TrendFlix One",
+		Price:             9.99,
+		Currency:          "USD",
+		BillingPeriodDays: 30,
+		IsActive:          true,
+	}
+
+	if err := DbConn.Create(&plan).Error; err != nil {
+		panic(fmt.Sprintf("subscription plan seed create failed: %v", err))
+	}
+
+	log.Printf("subscription plan seed: created plan %q (%.2f %s / %d days)", plan.Name, plan.Price, plan.Currency, plan.BillingPeriodDays)
+}
+
 func SeedBanners() {
 	if DbConn == nil {
 		panic("database is not connected")

@@ -135,7 +135,7 @@ type UpdateInput struct {
 	IsPrivate    *bool   `json:"is_private"`
 }
 
-func (s *Service) List(search string, page, perPage int) (*ListResult, error) {
+func (s *Service) List(search string, page, perPage int, userID uint) (*ListResult, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -144,7 +144,7 @@ func (s *Service) List(search string, page, perPage int) (*ListResult, error) {
 	}
 	offset := (page - 1) * perPage
 
-	items, total, err := s.communities.List(search, perPage, offset)
+	items, total, err := s.communities.List(search, perPage, offset, userID)
 	if err != nil {
 		return nil, err
 	}

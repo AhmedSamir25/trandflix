@@ -498,6 +498,78 @@ func loadCategoriesByIDs(categoryIDs []uint) ([]models.Category, string, int) {
 	return orderedCategories, "", 0
 }
 
+func GetItemAccess(c *fiber.Ctx) error {
+	context := fiber.Map{
+		"statusText": "Ok",
+		"msg":        "Access granted",
+	}
+
+	if database.DbConn == nil {
+		context["statusText"] = "bad"
+		context["msg"] = "Database error"
+		return c.Status(fiber.StatusInternalServerError).JSON(context)
+	}
+
+	_, err := requireAuthUser(c, context)
+	if err != nil {
+		return err
+	}
+
+	id, err := strconv.ParseUint(strings.TrimSpace(c.Params("id")), 10, 64)
+	if err != nil || id == 0 {
+		context["statusText"] = "bad"
+		context["msg"] = "Invalid item id"
+		return c.Status(fiber.StatusBadRequest).JSON(context)
+	}
+
+	var item models.Item
+	result := database.DbConn.First(&item, id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			context["statusText"] = "bad"
+			context["msg"] = "Item not found"
+			return c.Status(fiber.StatusNotFound).JSON(context)
+		}
+		log.Println("Error querying item:", result.Error)
+		context["statusText"] = "bad"
+		context["msg"] = "Database error"
+		return c.Status(fiber.StatusInternalServerError).JSON(context)
+	}
+
+	if item.Type != models.ItemTypeBook && item.Type != models.ItemTypeMovie && item.Type != models.ItemTypeTVShow {
+		context["content_link"] = item.ContentLink
+		return c.Status(fiber.StatusOK).JSON(context)
+	}
+
+	user, _ := requireAuthUser(c, context)
+
+	var subscription models.Subscription
+	subResult := database.DbConn.Where("user_id = ? AND status = ?", user.ID, models.SubscriptionStatusActive).
+		Where("ends_at > ?", time.Now()).
+		First(&subscription)
+
+	if subResult.Error != nil {
+		context["statusText"] = "bad"
+		context["msg"] = "Active subscription required to access this content"
+		return c.Status(fiber.StatusPaymentRequired).JSON(context)
+	}
+
+	context["content_link"] = item.ContentLink
+	return c.Status(fiber.StatusOK).JSON(context)
+}
+
+func requireAuthUser(c *fiber.Ctx, context fiber.Map) (models.User, error) {
+	userValue := c.Locals("currentUser")
+	user, ok := userValue.(models.User)
+	if !ok {
+		context["statusText"] = "bad"
+		context["msg"] = "Unauthorized"
+		return models.User{}, c.Status(fiber.StatusUnauthorized).JSON(context)
+	}
+
+	return user, nil
+}
+
 func replaceItemCategories(tx *gorm.DB, item *models.Item, categories []models.Category) error {
 	association := tx.Model(item).Association("Categories")
 	if association.Error != nil {

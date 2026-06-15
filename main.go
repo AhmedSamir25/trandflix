@@ -14,6 +14,7 @@ func main() {
 	database.Migrate()
 	database.SeedAdmin()
 	database.SeedCategories()
+	database.SeedSubscriptionPlan()
 	database.SeedItems()
 	database.SeedBanners()
 
@@ -35,6 +36,7 @@ func main() {
 	routers.RegisterRecommendationRoutes(app)
 	routers.RegisterAIAssistantRoutes(app)
 	routers.RegisterCommunityRoutes(app)
+	routers.RegisterSubscriptionRoutes(app)
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {

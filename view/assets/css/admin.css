@@ -1845,6 +1845,49 @@ body.admin-page {
 }
 
 /* ─── Communities management dashboard ───────────────────── */
+.comm-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.5fr);
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: stretch;
+}
+
+.comm-overview .stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.comm-breakdown-panel {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.comm-breakdown-panel .panel-heading { margin-bottom: 16px; }
+
+.comm-breakdown-panel #typeBars {
+  flex: 1;
+  display: grid;
+  align-content: center;
+}
+
+@media (max-width: 980px) {
+  .comm-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .comm-overview .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .comm-overview .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .comm-toolbar {
   display: flex;
   flex-wrap: wrap;

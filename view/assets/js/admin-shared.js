@@ -195,7 +195,6 @@ const ADMIN_DRAWER_LINKS = [
   { href: "/pages/admin/catalog.html",        icon: "📋", labelKey: "admin.navCatalog",     fallback: "All Items" },
   { href: "/pages/admin/banners.html",        icon: "🖼️", labelKey: "admin.navBanners",     fallback: "Banners" },
   { href: "/pages/admin/communities.html",       icon: "👥", labelKey: "admin.navCommunities", fallback: "Communities", badge: true },
-  { href: "/pages/admin/review-communities.html", icon: "✅", labelKey: "admin.commReviewNav", fallback: "Review pending" },
 ];
 
 function injectAdminDrawer() {
