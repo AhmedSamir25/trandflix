@@ -58,7 +58,7 @@ func Recommend(c *fiber.Ctx) error {
 	user, _ := currentUserFromContext(c)
 
 	repo := &services.GormAIRepository{DB: database.DbConn}
-	client := services.NewOpenRouterRecommender()
+	client := services.NewOpenRouterRecommenderWithSettings(services.LoadAISettingsConfig(database.DbConn))
 
 	service := services.NewAIRecommendationService(repo, client)
 

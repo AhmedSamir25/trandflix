@@ -190,6 +190,7 @@ function highlightActiveNav() {
 
 const ADMIN_DRAWER_LINKS = [
   { href: "/pages/admin.html",                icon: "🏠", labelKey: "admin.navDashboard",   fallback: "Dashboard" },
+  { href: "/pages/admin/charts.html",         icon: "📊", labelKey: "admin.navCharts",      fallback: "Charts" },
   { href: "/pages/admin/categories.html",     icon: "🗂️", labelKey: "admin.navCategories",  fallback: "Categories" },
   { href: "/pages/admin/create-item.html",    icon: "➕", labelKey: "admin.navCreateItem",  fallback: "Create Item" },
   { href: "/pages/admin/catalog.html",        icon: "📋", labelKey: "admin.navCatalog",     fallback: "All Items" },

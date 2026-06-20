@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.chartsPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · Charts</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js?v=communities-2"></script>
+    <script defer src="/assets/js/admin-shared.js?v=communities-1"></script>
+    <script defer src="/assets/js/admin-charts.js?v=subscriptions-1"></script>
+  </head>
+  <body class="admin-page">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" id="chartsHeading">Analytics</h1>
+          <p class="admin-subtitle" id="chartsSubtitle" data-i18n="admin.chartsSubtitle">Track how this metric grows over time.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/admin.html" data-i18n="admin.backToDashboard">Back to dashboard</a>
+        </div>
+      </header>
+
+      <p id="pageError" class="notice error-notice" hidden></p>
+
+      <section class="panel chart-panel">
+        <div class="panel-heading chart-toolbar">
+          <div>
+            <p class="panel-kicker" data-i18n="admin.chartsTrendKicker">Trend</p>
+            <h2 id="chartPanelTitle">—</h2>
+          </div>
+          <div class="chart-controls">
+            <div id="subscriptionMetricSwitcher" class="segmented" role="group" aria-label="Subscription metric" hidden>
+              <button class="segmented-btn" type="button" data-subscription-metric="subscriptions" data-i18n="admin.statSubscriptionsToggle">Subs</button>
+              <button class="segmented-btn" type="button" data-subscription-metric="subscription_revenue" data-i18n="admin.statRevenueToggle">Revenue</button>
+            </div>
+            <div id="periodSwitcher" class="segmented" role="group" aria-label="Period">
+              <button class="segmented-btn" type="button" data-days="30" data-i18n="admin.charts30Days">30D</button>
+              <button class="segmented-btn" type="button" data-days="90" data-i18n="admin.charts90Days">90D</button>
+              <button class="segmented-btn" type="button" data-days="365" data-i18n="admin.charts1Year">1Y</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="lineChart" class="line-chart-wrap" role="img" aria-label="line chart"></div>
+
+        <div id="chartSummary" class="chart-summary"></div>
+      </section>
+    </main>
+  </body>
+</html>

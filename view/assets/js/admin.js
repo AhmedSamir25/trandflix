@@ -1,4 +1,5 @@
 let dashboardStats = null;
+let subscriptionStatMode = "count";
 
 const DASHBOARD_TYPE_META = {
   movie: { labelKey: "admin.typeMovie", fallback: "Movies", icon: "▶" },
@@ -15,6 +16,47 @@ function getDashboardTypeLabel(type) {
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
+}
+
+function formatDashboardFull(value) {
+  return new Intl.NumberFormat().format(Number(value) || 0);
+}
+
+function formatDashboardMoney(value, currency) {
+  const amount = Number(value) || 0;
+  const code = currency || "USD";
+  try {
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: code }).format(amount);
+  } catch {
+    return `${formatDashboardFull(amount)} ${code}`;
+  }
+}
+
+function renderSubscriptionStat() {
+  const subscription = dashboardStats?.user_stats?.subscription_stats || {};
+  const isRevenue = subscriptionStatMode === "revenue";
+  const labelKey = isRevenue ? "admin.statSubscriptionRevenue" : "admin.statSubscriptions";
+  const hintKey = isRevenue ? "admin.statSubscriptionRevenueHint" : "admin.statSubscriptionsHint";
+  const metric = isRevenue ? "subscription_revenue" : "subscriptions";
+  const value = isRevenue
+    ? formatDashboardMoney(subscription.revenue_total, subscription.currency)
+    : formatDashboardFull(subscription.total);
+
+  setText("statSubscriptionLabel", t(labelKey));
+  setText("statSubscriptionHint", t(hintKey));
+  setText("statSubscriptions", value);
+
+  const link = document.getElementById("subscriptionChartLink");
+  if (link) {
+    link.href = `/pages/admin/charts.html?metric=${metric}`;
+    link.setAttribute("aria-label", t(labelKey));
+  }
+
+  document.querySelectorAll("[data-subscription-stat-mode]").forEach((btn) => {
+    const active = btn.dataset.subscriptionStatMode === subscriptionStatMode;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-pressed", String(active));
+  });
 }
 
 function getTypeCounts() {
@@ -108,7 +150,7 @@ function renderCategorySnapshot() {
 }
 
 function setDashboardLoading() {
-  ["statTotalItems", "statUsers", "statCategoriesCard", "statMovies", "statTvShows", "statGames", "statBooks", "statCategories", "statAvgRating", "statLatestItem"].forEach((id) => {
+  ["statTotalItems", "statUsers", "statCommunities", "statSubscriptions", "statCategoriesCard", "statMovies", "statTvShows", "statGames", "statBooks", "statCategories", "statAvgRating", "statLatestItem"].forEach((id) => {
     setText(id, "-");
   });
 }
@@ -126,6 +168,8 @@ function renderDashboard() {
 
   setText("statTotalItems", totalItems);
   setText("statUsers", Number(dashboardStats.total_users) || 0);
+  setText("statCommunities", Number(dashboardStats.total_communities) || 0);
+  renderSubscriptionStat();
   setText("statCategoriesCard", Number(dashboardStats.total_categories) || 0);
   setText("statMovies", typeCounts.movie);
   setText("statTvShows", typeCounts.tv_show);
@@ -168,11 +212,21 @@ async function loadDashboard() {
   }
 }
 
+function bindSubscriptionStatToggle() {
+  document.querySelectorAll("[data-subscription-stat-mode]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      subscriptionStatMode = btn.dataset.subscriptionStatMode === "revenue" ? "revenue" : "count";
+      renderSubscriptionStat();
+    });
+  });
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
   if (!requireAdmin()) return;
 
   bindLogout();
   highlightActiveNav();
+  bindSubscriptionStatToggle();
 
   document.getElementById("refreshDashboardBtn")?.addEventListener("click", () =>
     loadDashboard().catch(showPageError),

@@ -43,7 +43,47 @@ func GetLists(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(context)
 	}
 
-	context["lists"] = lists
+	listIDs := make([]uint, len(lists))
+	for i, l := range lists {
+		listIDs[i] = l.ID
+	}
+
+	counts := make(map[uint]int64)
+	if len(listIDs) > 0 {
+		type countRow struct {
+			UserListID uint
+			Count      int64
+		}
+		var rows []countRow
+		if err := database.DbConn.Model(&models.UserListItem{}).
+			Select("user_list_id, count(*) as count").
+			Where("user_list_id IN ?", listIDs).
+			Group("user_list_id").
+			Scan(&rows).Error; err != nil {
+			log.Println("Error counting list items:", err)
+			context["statusText"] = "bad"
+			context["msg"] = "Database error"
+			return c.Status(fiber.StatusInternalServerError).JSON(context)
+		}
+		for _, r := range rows {
+			counts[r.UserListID] = r.Count
+		}
+	}
+
+	type listWithCount struct {
+		models.UserList
+		ItemsCount int64 `json:"items_count"`
+	}
+
+	listsWithCounts := make([]listWithCount, len(lists))
+	for i, l := range lists {
+		listsWithCounts[i] = listWithCount{
+			UserList:   l,
+			ItemsCount: counts[l.ID],
+		}
+	}
+
+	context["lists"] = listsWithCounts
 	return c.Status(fiber.StatusOK).JSON(context)
 }
 

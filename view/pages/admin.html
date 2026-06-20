@@ -6,9 +6,9 @@
     <title>TrendFlix · Admin Dashboard</title>
     <link rel="stylesheet" href="/assets/css/base.css" />
     <link rel="stylesheet" href="/assets/css/admin.css" />
-    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/i18n.js?v=communities-2"></script>
     <script defer src="/assets/js/admin-shared.js?v=communities-1"></script>
-    <script defer src="/assets/js/admin.js?v=communities-1"></script>
+    <script defer src="/assets/js/admin.js?v=subscriptions-1"></script>
   </head>
   <body class="admin-page">
     <div class="page-tools">
@@ -37,48 +37,67 @@
       <p id="pageError" class="notice error-notice" hidden></p>
 
       <section class="stats-grid" aria-label="Dashboard statistics">
-        <article class="stat-card stat-total">
+        <a class="stat-card stat-total" href="/pages/admin/charts.html?metric=items" data-i18n-aria-label="admin.statTotalItems">
           <span class="stat-icon">▦</span>
           <span class="stat-label" data-i18n="admin.statTotalItems">Total items</span>
           <strong id="statTotalItems">-</strong>
           <small data-i18n="admin.statTotalItemsHint">Published in the library</small>
-        </article>
-        <article class="stat-card stat-users">
+        </a>
+        <a class="stat-card stat-users" href="/pages/admin/charts.html?metric=users" data-i18n-aria-label="admin.statUsers">
           <span class="stat-icon">●</span>
           <span class="stat-label" data-i18n="admin.statUsers">Users</span>
           <strong id="statUsers">-</strong>
           <small data-i18n="admin.statUsersHint">Registered accounts</small>
+        </a>
+        <a class="stat-card stat-communities" href="/pages/admin/charts.html?metric=communities" data-i18n-aria-label="admin.statCommunities">
+          <span class="stat-icon">👥</span>
+          <span class="stat-label" data-i18n="admin.statCommunities">Communities</span>
+          <strong id="statCommunities">-</strong>
+          <small data-i18n="admin.statCommunitiesHint">User-created groups</small>
+        </a>
+        <article class="stat-card stat-subscription subscription-stat-card" data-i18n-aria-label="admin.statSubscriptions">
+          <div class="stat-card-top">
+            <span class="stat-icon">$</span>
+            <div class="subscription-stat-toggle" role="group" aria-label="Subscription statistic">
+              <button class="subscription-stat-toggle-btn active" type="button" data-subscription-stat-mode="count" data-i18n="admin.statSubscriptionsToggle">Subs</button>
+              <button class="subscription-stat-toggle-btn" type="button" data-subscription-stat-mode="revenue" data-i18n="admin.statRevenueToggle">Revenue</button>
+            </div>
+          </div>
+          <span class="stat-label" id="statSubscriptionLabel" data-i18n="admin.statSubscriptions">Subscriptions</span>
+          <strong id="statSubscriptions">-</strong>
+          <small id="statSubscriptionHint" data-i18n="admin.statSubscriptionsHint">Paid subscriptions</small>
+          <a class="stat-card-link" id="subscriptionChartLink" href="/pages/admin/charts.html?metric=subscriptions" data-i18n="admin.viewChart">View chart</a>
         </article>
-        <article class="stat-card stat-categories">
+        <a class="stat-card stat-categories" href="/pages/admin/charts.html?metric=categories" data-i18n-aria-label="admin.statCategories">
           <span class="stat-icon">#</span>
           <span class="stat-label" data-i18n="admin.statCategories">Categories</span>
           <strong id="statCategoriesCard">-</strong>
           <small data-i18n="admin.statCategoriesHint">Content sections</small>
-        </article>
-        <article class="stat-card stat-movie">
+        </a>
+        <a class="stat-card stat-movie" href="/pages/admin/charts.html?metric=movies" data-i18n-aria-label="admin.statMovies">
           <span class="stat-icon">▶</span>
           <span class="stat-label" data-i18n="admin.statMovies">Movies</span>
           <strong id="statMovies">-</strong>
           <small data-i18n="admin.statMoviesHint">Watchable titles</small>
-        </article>
-        <article class="stat-card stat-tv-show">
+        </a>
+        <a class="stat-card stat-tv-show" href="/pages/admin/charts.html?metric=tv_shows" data-i18n-aria-label="admin.statTvShows">
           <span class="stat-icon">▣</span>
           <span class="stat-label" data-i18n="admin.statTvShows">TV Shows</span>
           <strong id="statTvShows">-</strong>
           <small data-i18n="admin.statTvShowsHint">Streamable series</small>
-        </article>
-        <article class="stat-card stat-game">
+        </a>
+        <a class="stat-card stat-game" href="/pages/admin/charts.html?metric=games" data-i18n-aria-label="admin.statGames">
           <span class="stat-icon">◆</span>
           <span class="stat-label" data-i18n="admin.statGames">Games</span>
           <strong id="statGames">-</strong>
           <small data-i18n="admin.statGamesHint">Playable entries</small>
-        </article>
-        <article class="stat-card stat-book">
+        </a>
+        <a class="stat-card stat-book" href="/pages/admin/charts.html?metric=books" data-i18n-aria-label="admin.statBooks">
           <span class="stat-icon">◫</span>
           <span class="stat-label" data-i18n="admin.statBooks">Books</span>
           <strong id="statBooks">-</strong>
           <small data-i18n="admin.statBooksHint">Readable content</small>
-        </article>
+        </a>
       </section>
 
       <section class="admin-dashboard-grid">
@@ -123,6 +142,13 @@
               <span>
                 <strong data-i18n="admin.navSubscriptionPlan">Subscription Plan</strong>
                 <small data-i18n="admin.subscriptionPlanSubtitle">Manage the single subscription plan pricing and settings.</small>
+              </span>
+            </a>
+            <a class="control-action" href="/pages/admin/ai-settings.html">
+              <span class="control-icon">✦</span>
+              <span>
+                <strong data-i18n="admin.navAISettings">AI Settings</strong>
+                <small data-i18n="admin.aiSettingsSubtitle">Manage the AI provider, model, and API keys used across TrendFlix.</small>
               </span>
             </a>
             <a class="control-action" href="/pages/admin/communities.html">

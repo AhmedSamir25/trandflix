@@ -34,6 +34,7 @@
       </header>
 
       <p id="pageError" class="notice error-notice" hidden></p>
+      <p id="planLoading" class="notice" role="status" aria-live="polite" data-i18n="admin.subscriptionPlanLoading">Loading subscription plan...</p>
 
       <section class="dashboard-grid single-col">
         <article class="card panel">
@@ -44,30 +45,30 @@
             </div>
           </div>
 
-          <form id="planForm" class="form-stack">
+          <form id="planForm" class="form-stack" aria-busy="true">
             <label class="field">
               <span data-i18n="admin.subscriptionPlanName">Plan Name</span>
-              <input id="planName" name="name" type="text" required />
+              <input id="planName" name="name" type="text" required disabled />
             </label>
             <div class="field-row-admin">
               <label class="field">
                 <span data-i18n="admin.subscriptionPlanPrice">Price</span>
-                <input id="planPrice" name="price" type="number" min="0.01" step="0.01" required />
+                <input id="planPrice" name="price" type="number" min="0.01" step="0.01" required disabled />
               </label>
               <label class="field">
                 <span data-i18n="admin.subscriptionPlanCurrency">Currency</span>
-                <input id="planCurrency" name="currency" type="text" maxlength="3" required placeholder="USD" />
+                <input id="planCurrency" name="currency" type="text" maxlength="3" required placeholder="USD" disabled />
               </label>
             </div>
             <label class="field">
               <span data-i18n="admin.subscriptionPlanBillingPeriod">Billing Period (days)</span>
-              <input id="planBillingDays" name="billing_period_days" type="number" min="1" required />
+              <input id="planBillingDays" name="billing_period_days" type="number" min="1" required disabled />
             </label>
             <label class="field-inline">
-              <input id="planIsActive" name="is_active" type="checkbox" />
+              <input id="planIsActive" name="is_active" type="checkbox" disabled />
               <span data-i18n="admin.subscriptionPlanActive">Plan is active</span>
             </label>
-            <button class="btn primary" id="savePlanBtn" type="submit" data-i18n="admin.subscriptionPlanSave">Save Plan</button>
+            <button class="btn primary" id="savePlanBtn" type="submit" data-i18n="admin.subscriptionPlanSave" disabled>Save Plan</button>
             <p id="planStatus" class="notice" hidden></p>
           </form>
         </article>

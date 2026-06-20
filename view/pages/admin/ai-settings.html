@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-title="admin.aiSettingsPageTitle">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrendFlix · AI Settings</title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script defer src="/assets/js/i18n.js"></script>
+    <script defer src="/assets/js/admin-shared.js"></script>
+    <script defer src="/assets/js/admin-ai-settings.js"></script>
+  </head>
+  <body class="admin-page">
+    <div class="page-tools">
+      <div class="lang-menu">
+        <button class="lang-trigger" type="button" data-lang-trigger data-i18n-aria-label="common.language" aria-expanded="false">🌐</button>
+        <div class="lang-menu-list" data-lang-menu>
+          <button class="lang-option" type="button" data-set-lang="en" data-i18n="common.english">English</button>
+          <button class="lang-option" type="button" data-set-lang="ar" data-i18n="common.arabic">Arabic</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow" data-i18n="admin.eyebrow">Admin Dashboard</p>
+          <h1 class="brand" data-i18n="admin.aiSettingsHeading">AI Settings</h1>
+          <p class="admin-subtitle" data-i18n="admin.aiSettingsSubtitle">Manage the AI provider, model, and API keys used across TrendFlix.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/pages/admin.html" data-i18n="admin.backToDashboard">Back to Dashboard</a>
+        </div>
+      </header>
+
+      <p id="pageError" class="notice error-notice" hidden></p>
+
+      <section class="dashboard-grid single-col">
+        <article class="card panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker" data-i18n="admin.aiSettingsKicker">AI Assistant</p>
+              <h2 data-i18n="admin.aiSettingsTitle">Update AI configuration</h2>
+            </div>
+          </div>
+
+          <form id="aiForm" class="form-stack">
+            <label class="field">
+              <span data-i18n="admin.aiSettingsProvider">Provider</span>
+              <select id="aiProvider" name="provider">
+                <option value="openai_compatible" data-i18n="admin.aiSettingsProviderOpenAICompatible">OpenAI compatible</option>
+                <option value="openrouter" data-i18n="admin.aiSettingsProviderOpenRouter">OpenRouter</option>
+              </select>
+            </label>
+
+            <div class="panel provider-group" id="openRouterGroup">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker" data-i18n="admin.aiSettingsOpenRouterKicker">OpenRouter</p>
+                  <h2 data-i18n="admin.aiSettingsOpenRouterTitle">OpenRouter credentials</h2>
+                </div>
+              </div>
+              <label class="field">
+                <span data-i18n="admin.aiSettingsOpenRouterKey">API key</span>
+                <input id="openRouterKey" name="openrouter_api_key" type="password" autocomplete="off" placeholder="sk-or-..." />
+              </label>
+              <label class="field">
+                <span data-i18n="admin.aiSettingsOpenRouterModel">Model</span>
+                <input id="openRouterModel" name="openrouter_model" type="text" placeholder="openai/gpt-4o-mini" />
+              </label>
+            </div>
+
+            <div class="panel provider-group" id="openAICompatibleGroup">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker" data-i18n="admin.aiSettingsOpenAIKicker">OpenAI compatible</p>
+                  <h2 data-i18n="admin.aiSettingsOpenAITitle">OpenAI compatible credentials</h2>
+                </div>
+              </div>
+              <label class="field">
+                <span data-i18n="admin.aiSettingsOpenAIKey">API key</span>
+                <input id="openAICompatibleKey" name="openai_compatible_api_key" type="password" autocomplete="off" placeholder="sk-..." />
+              </label>
+              <label class="field">
+                <span data-i18n="admin.aiSettingsOpenAIBaseURL">Base URL</span>
+                <input id="openAICompatibleBaseURL" name="openai_compatible_base_url" type="text" placeholder="https://api.openai.com/v1" />
+              </label>
+              <label class="field">
+                <span data-i18n="admin.aiSettingsOpenAIModel">Model</span>
+                <input id="openAICompatibleModel" name="openai_compatible_model" type="text" placeholder="gpt-4o-mini" />
+              </label>
+            </div>
+
+            <p class="notice hint-notice" data-i18n="admin.aiSettingsKeyHint">API keys are masked. Leave a key field blank to keep the current value.</p>
+            <button class="btn primary" id="saveAiBtn" type="submit" data-i18n="admin.aiSettingsSave">Save Settings</button>
+            <p id="aiStatus" class="notice" hidden></p>
+          </form>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/gofiber/fiber/v2"
 
+	aisettingscontroller "trendflix/controller/ai_settings_controller"
 	admincontroller "trendflix/controller/admin_controller"
 	subscriptionplancontroller "trendflix/controller/subscription_plan_controller"
 	"trendflix/middleware"
@@ -15,6 +16,9 @@ func RegisterAdminRoutes(app *fiber.App) {
 	admin.Get("/stats/types", admincontroller.GetTypeStats)
 	admin.Get("/stats/categories", admincontroller.GetCategoryStats)
 	admin.Get("/stats/users", admincontroller.GetUserStats)
+	admin.Get("/stats/timeseries", admincontroller.GetTimeseriesStats)
 	admin.Get("/subscription-plan", subscriptionplancontroller.GetPlan)
 	admin.Put("/subscription-plan", subscriptionplancontroller.UpdatePlan)
+	admin.Get("/ai-settings", aisettingscontroller.GetAISettings)
+	admin.Put("/ai-settings", aisettingscontroller.UpdateAISettings)
 }

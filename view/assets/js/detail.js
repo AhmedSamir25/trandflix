@@ -27,6 +27,54 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
+function syncDocumentLanguage() {
+  const lang = window.TrendFlixI18n?.getLang?.() || "en";
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+}
+
+function showConfirmDialog({ title, message, icon, confirmText, cancelText, onConfirm }) {
+  document.getElementById("confirmDialog")?.remove();
+
+  const icons = {
+    lock: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`,
+    info: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>`,
+  };
+
+  const dlg = document.createElement("div");
+  dlg.className = "confirm-dialog";
+  dlg.id = "confirmDialog";
+  dlg.innerHTML = `
+    <div class="confirm-dialog-backdrop" data-close></div>
+    <div class="confirm-dialog-content" role="dialog" aria-modal="true">
+      <div class="confirm-dialog-icon">${icons[icon] || icons.info}</div>
+      <h3 class="confirm-dialog-title">${escapeHtml(title || "")}</h3>
+      <p class="confirm-dialog-message">${escapeHtml(message || "")}</p>
+      <div class="confirm-dialog-actions">
+        <button class="confirm-dialog-cancel" type="button" data-close>${escapeHtml(cancelText || "Cancel")}</button>
+        <button class="confirm-dialog-confirm" type="button">${escapeHtml(confirmText || "OK")}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(dlg);
+  document.body.style.overflow = "hidden";
+
+  const close = () => {
+    dlg.remove();
+    document.body.style.overflow = "";
+    document.removeEventListener("keydown", onKey);
+  };
+  const onKey = (e) => {
+    if (e.key === "Escape") close();
+  };
+  dlg.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
+  dlg.querySelector(".confirm-dialog-confirm").addEventListener("click", () => {
+    close();
+    onConfirm?.();
+  });
+  document.addEventListener("keydown", onKey);
+}
+
 function getFallbackImage(title) {
   return `${FALLBACK_IMAGE_BASE}?text=${encodeURIComponent(title || "TrendFlix")}`;
 }
@@ -211,7 +259,8 @@ function buildPage(item, reviews) {
 
       <nav class="detail-topbar">
         <button class="detail-back" id="backBtn" type="button">
-          ← <span>${escapeHtml(t("detail.back"))}</span>
+          <span class="detail-back-icon" aria-hidden="true">←</span>
+          <span>${escapeHtml(t("detail.back"))}</span>
         </button>
         <span class="detail-brand">TrendFlix</span>
         <div class="lang-menu">
@@ -327,8 +376,14 @@ function attachHandlers(item, reviews, token) {
           window.open(accessLink, "_blank", "noopener,noreferrer");
         }
       } else if (res.status === 402) {
-        alert(t("detail.subscriptionRequired"));
-        window.location.href = "/pages/subscription.html";
+        showConfirmDialog({
+          title: t("detail.subscriptionRequiredTitle"),
+          message: t("detail.subscriptionRequired"),
+          icon: "lock",
+          confirmText: t("detail.viewPlans"),
+          cancelText: t("detail.notNow"),
+          onConfirm: () => { window.location.href = "/pages/subscription.html"; },
+        });
       } else {
         alert(data?.msg || t("detail.accessFailed"));
       }
@@ -562,6 +617,7 @@ function rerender() {
   if (!currentItem) return;
   const root = document.getElementById("detailRoot");
   if (!root) return;
+  syncDocumentLanguage();
   root.innerHTML = buildPage(currentItem, currentReviews);
   window.TrendFlixI18n?.translatePage();
   attachHandlers(currentItem, currentReviews, currentToken);
@@ -685,6 +741,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const token = requireAuth();
   if (!token) return;
   currentToken = token;
+  syncDocumentLanguage();
 
   const id = getItemIdFromLocation();
   if (!id) {
@@ -738,7 +795,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     } catch {
     }
 
-    window.addEventListener("trendflix:languagechange", rerender);
+    window.addEventListener("trendflix:languagechange", () => {
+      syncDocumentLanguage();
+      rerender();
+    });
 
   } catch (err) {
     console.error("Failed to load item", err);

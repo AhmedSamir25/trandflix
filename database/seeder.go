@@ -188,6 +188,43 @@ func SeedSubscriptionPlan() {
 	log.Printf("subscription plan seed: created plan %q (%.2f %s / %d days)", plan.Name, plan.Price, plan.Currency, plan.BillingPeriodDays)
 }
 
+func SeedAISettings() {
+	if DbConn == nil {
+		panic("database is not connected")
+	}
+
+	var count int64
+	if err := DbConn.Model(&models.AISetting{}).Count(&count).Error; err != nil {
+		panic(fmt.Sprintf("ai settings seed count failed: %v", err))
+	}
+
+	if count > 0 {
+		log.Printf("ai settings seed: skipped because %d rows already exist", count)
+		return
+	}
+
+	provider := strings.ToLower(strings.TrimSpace(os.Getenv("AI_PROVIDER")))
+	if provider == "" {
+		provider = models.AIProviderOpenAICompatible
+	}
+
+	settings := models.AISetting{
+		ID:                      1,
+		Provider:                provider,
+		OpenRouterAPIKey:        strings.TrimSpace(os.Getenv("OPENROUTER_API_KEY")),
+		OpenRouterModel:         strings.TrimSpace(os.Getenv("OPENROUTER_MODEL")),
+		OpenAICompatibleAPIKey:  strings.TrimSpace(os.Getenv("OPENAI_COMPATIBLE_API_KEY")),
+		OpenAICompatibleBaseURL: strings.TrimSpace(os.Getenv("OPENAI_COMPATIBLE_BASE_URL")),
+		OpenAICompatibleModel:   strings.TrimSpace(os.Getenv("OPENAI_COMPATIBLE_MODEL")),
+	}
+
+	if err := DbConn.Create(&settings).Error; err != nil {
+		panic(fmt.Sprintf("ai settings seed create failed: %v", err))
+	}
+
+	log.Printf("ai settings seed: created settings for provider %q", settings.Provider)
+}
+
 func SeedBanners() {
 	if DbConn == nil {
 		panic("database is not connected")

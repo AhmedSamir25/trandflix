@@ -17,6 +17,8 @@ func main() {
 	database.SeedSubscriptionPlan()
 	database.SeedItems()
 	database.SeedBanners()
+	database.SeedAISettings()
+	database.SeedCommunityContent()
 
 	app := fiber.New()
 	app.Static("/upload", "./upload")

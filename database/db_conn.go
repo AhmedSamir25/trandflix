@@ -87,6 +87,7 @@ func Migrate() {
 		&models.SubscriptionPlan{},
 		&models.Subscription{},
 		&models.Payment{},
+		&models.AISetting{},
 	)
 	if err != nil {
 		panic(fmt.Sprintf("migration failed: %v", err))

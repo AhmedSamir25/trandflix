@@ -9,6 +9,10 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"gorm.io/gorm"
+
+	"trendflix/models"
 )
 
 type OpenRouterRecommender struct {
@@ -19,16 +23,97 @@ type OpenRouterRecommender struct {
 	Client   *http.Client
 }
 
+// AISettingsConfig carries admin-configured AI settings. Empty fields fall back
+// to the environment-based defaults so the recommender keeps working before any
+// value is saved from the dashboard.
+type AISettingsConfig struct {
+	Provider                string
+	OpenRouterAPIKey        string
+	OpenRouterModel         string
+	OpenAICompatibleAPIKey  string
+	OpenAICompatibleBaseURL string
+	OpenAICompatibleModel   string
+}
+
+// LoadAISettingsConfig reads the admin-configured AI settings row. If the table
+// is empty or the database is unavailable, an empty config is returned and the
+// recommender falls back to environment variables.
+func LoadAISettingsConfig(db *gorm.DB) AISettingsConfig {
+	if db == nil {
+		return AISettingsConfig{}
+	}
+
+	var settings models.AISetting
+	if err := db.First(&settings).Error; err != nil {
+		return AISettingsConfig{}
+	}
+
+	return AISettingsConfig{
+		Provider:                settings.Provider,
+		OpenRouterAPIKey:        settings.OpenRouterAPIKey,
+		OpenRouterModel:         settings.OpenRouterModel,
+		OpenAICompatibleAPIKey:  settings.OpenAICompatibleAPIKey,
+		OpenAICompatibleBaseURL: settings.OpenAICompatibleBaseURL,
+		OpenAICompatibleModel:   settings.OpenAICompatibleModel,
+	}
+}
+
+// NewOpenRouterRecommender builds the recommender using environment variables
+// only. Prefer NewOpenRouterRecommenderWithSettings when dashboard settings are
+// available.
 func NewOpenRouterRecommender() *OpenRouterRecommender {
-	provider := getAIProvider()
+	return NewOpenRouterRecommenderWithSettings(AISettingsConfig{})
+}
+
+// NewOpenRouterRecommenderWithSettings builds the recommender from admin
+// settings, falling back to environment variables for any field that is empty.
+func NewOpenRouterRecommenderWithSettings(cfg AISettingsConfig) *OpenRouterRecommender {
+	provider := normalizeAIProvider(cfg.Provider)
 
 	return &OpenRouterRecommender{
 		Provider: provider,
-		APIKey:   getAIAPIKey(provider),
-		Model:    getAIModel(provider),
-		URL:      getAIURL(provider),
+		APIKey:   resolveAIAPIKey(provider, cfg),
+		Model:    resolveAIModel(provider, cfg),
+		URL:      resolveAIURL(provider, cfg),
 		Client:   &http.Client{Timeout: AIRequestTimeout},
 	}
+}
+
+func resolveAIAPIKey(provider string, cfg AISettingsConfig) string {
+	if provider == aiProviderOpenAICompatible {
+		if v := strings.TrimSpace(cfg.OpenAICompatibleAPIKey); v != "" {
+			return v
+		}
+	}
+	if provider == aiProviderOpenRouter {
+		if v := strings.TrimSpace(cfg.OpenRouterAPIKey); v != "" {
+			return v
+		}
+	}
+	return getAIAPIKey(provider)
+}
+
+func resolveAIModel(provider string, cfg AISettingsConfig) string {
+	if provider == aiProviderOpenAICompatible {
+		if v := strings.TrimSpace(cfg.OpenAICompatibleModel); v != "" {
+			return v
+		}
+	}
+	if provider == aiProviderOpenRouter {
+		if v := strings.TrimSpace(cfg.OpenRouterModel); v != "" {
+			return v
+		}
+	}
+	return getAIModel(provider)
+}
+
+func resolveAIURL(provider string, cfg AISettingsConfig) string {
+	if provider == aiProviderOpenAICompatible {
+		if v := strings.TrimSpace(cfg.OpenAICompatibleBaseURL); v != "" {
+			return normalizeAIChatCompletionsURL(v)
+		}
+	}
+	return getAIURL(provider)
 }
 
 func (r *OpenRouterRecommender) Available() bool {
@@ -150,6 +235,19 @@ func getAIProvider() string {
 		return aiProviderOpenAICompatible
 	default:
 		return aiProviderOpenRouter
+	}
+}
+
+// normalizeAIProvider resolves the provider from the admin settings value,
+// falling back to the environment when it is empty or unrecognised.
+func normalizeAIProvider(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case aiProviderOpenRouter:
+		return aiProviderOpenRouter
+	case aiProviderOpenAICompatible, "openai-compatible", "openai", "compatible":
+		return aiProviderOpenAICompatible
+	default:
+		return getAIProvider()
 	}
 }
 

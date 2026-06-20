@@ -98,7 +98,7 @@ function renderLists() {
         <div class="lists-card-body">
           <div class="list-card-icon">📁</div>
           <h2 class="lists-card-title">${name}</h2>
-          <div class="list-card-count">${t("lists.itemCount")}: 0</div>
+          <div class="list-card-count">${t("lists.itemCount")}: ${Number(list.items_count) || 0}</div>
         </div>
       </article>
     `;

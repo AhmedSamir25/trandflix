@@ -25,6 +25,9 @@ let catalogStatusKey = "app.loadingCatalog";
 let currentToken = "";
 let favoriteItemIds = new Set();
 let recommendations = [];
+let recommendationsLoaded = false;
+let recommendationSignalLoaded = false;
+let hasRecommendationSignal = false;
 let activeRecommendationType = "all";
 let chatHistory = [];
 let chatPending = false;
@@ -442,21 +445,40 @@ function createRecommendationTypeChips() {
   return chips.join("");
 }
 
+function createRecommendationSkeleton(count = 8) {
+  return Array.from({ length: count })
+    .map(
+      () => `<div class="card-item skeleton" aria-hidden="true">
+        <div class="skel skel-img"></div>
+        <div class="skel skel-title"></div>
+        <div class="skel skel-line"></div>
+      </div>`,
+    )
+    .join("");
+}
+
 function createRecommendationSection() {
-  if (!recommendations.length) return "";
   if (searchQuery.trim()) return "";
 
-  const filteredRecommendations = getFilteredRecommendations();
-  const content = filteredRecommendations.length
-    ? filteredRecommendations.map((rec) => recommendationCard(rec)).join("")
-    : `<p class="row-status">${escapeHtml(t("app.noItemsFound"))}</p>`;
+  let content;
+  let showChips = false;
+
+  if (recommendationsLoaded) {
+    if (!recommendations.length) return "";
+    const filteredRecommendations = getFilteredRecommendations();
+    content = filteredRecommendations.length
+      ? filteredRecommendations.map((rec) => recommendationCard(rec)).join("")
+      : `<p class="row-status">${escapeHtml(t("app.noItemsFound"))}</p>`;
+    showChips = true;
+  } else {
+    if (!recommendationSignalLoaded || !hasRecommendationSignal) return "";
+    content = createRecommendationSkeleton();
+  }
 
   return `
     <section class="section section-rec" data-section="recommendations">
       <h2>✨ <span>${escapeHtml(t("app.recommendedForYou"))}</span></h2>
-      <div class="cat-row rec-type-row" data-rec-type-row>
-        ${createRecommendationTypeChips()}
-      </div>
+      ${showChips ? `<div class="cat-row rec-type-row" data-rec-type-row>${createRecommendationTypeChips()}</div>` : ""}
       <div class="row-wrapper">
         <button class="row-arrow row-arrow-left" type="button" aria-label="Scroll left">◀</button>
         <div class="row">${content}</div>
@@ -464,6 +486,28 @@ function createRecommendationSection() {
       </div>
     </section>
   `;
+}
+
+function refreshRecommendationSection() {
+  const catalogSections = document.getElementById("catalogSections");
+  if (!catalogSections) return;
+
+  const existing = catalogSections.querySelector('[data-section="recommendations"]');
+  const markup = createRecommendationSection();
+
+  if (existing) {
+    if (markup) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = markup;
+      existing.replaceWith(wrapper.firstElementChild);
+    } else {
+      existing.remove();
+    }
+  } else if (markup) {
+    catalogSections.insertAdjacentHTML("afterbegin", markup);
+  }
+
+  initRowArrows();
 }
 
 function normalizeRecommendationFromItem(item, reason) {
@@ -585,25 +629,44 @@ async function loadBanners() {
   }
 }
 
-async function loadFavoriteItemIds(token) {
-  const response = await fetchJson("/favorites", {}, token);
-  favoriteItemIds = new Set(
-    (Array.isArray(response?.items) ? response.items : []).map((item) => String(item.id)),
-  );
+async function loadRecommendationSignal(token) {
+  const [favoritesResponse, watchLaterResponse] = await Promise.all([
+    fetchJson("/favorites", {}, token),
+    fetchJson("/watch-later", {}, token),
+  ]);
+  const favoriteItems = Array.isArray(favoritesResponse?.items) ? favoritesResponse.items : [];
+  const watchLaterItems = Array.isArray(watchLaterResponse?.items) ? watchLaterResponse.items : [];
+
+  favoriteItemIds = new Set(favoriteItems.map((item) => String(item.id)));
+  hasRecommendationSignal = favoriteItems.length > 0 || watchLaterItems.length > 0;
+  recommendationSignalLoaded = true;
 }
 
 async function loadRecommendations(token) {
+  let apiSuccess = false;
   try {
-    const response = await fetchJson("/api/recommendations/for-you?limit=20", {}, token);
+    const lang = encodeURIComponent(getLang());
+    const response = await fetchJson(
+      `/api/recommendations/for-you?limit=20&language=${lang}`,
+      {},
+      token,
+      13000,
+    );
     recommendations = Array.isArray(response?.data) ? response.data : [];
+    apiSuccess = true;
   } catch (error) {
     console.error("Failed to load API recommendations", error);
     recommendations = [];
   }
 
-  if (!recommendations.length) {
+  // Only use the local fallback when the API itself failed. An empty success
+  // response means the user has no favorites/watch later, so the For You
+  // section stays hidden instead of showing generic top-rated items.
+  if (!recommendations.length && !apiSuccess && hasRecommendationSignal) {
     recommendations = buildLocalRecommendationFallback(20);
   }
+
+  recommendationsLoaded = true;
 }
 
 async function toggleFavorite(btn) {
@@ -899,26 +962,27 @@ window.addEventListener("DOMContentLoaded", async () => {
   loadBanners();
 
   try {
-    await loadCatalog();
+    await Promise.all([
+      loadCatalog(),
+      loadRecommendationSignal(token).catch((error) => {
+        console.error("Failed to load recommendation signal", error);
+        recommendationSignalLoaded = true;
+        hasRecommendationSignal = false;
+      }),
+    ]);
   } catch (error) {
     console.error("Failed to load catalog", error);
     setCatalogStatus("app.catalogLoadFailed");
   }
 
-  try {
-    await loadFavoriteItemIds(token);
-  } catch (error) {
-    console.error("Failed to load favorites", error);
-  }
+  refreshRecommendationSection();
 
-  try {
-    await loadRecommendations(token);
-  } catch (error) {
-    console.error("Failed to load recommendations", error);
-  }
-
-  renderCatalog();
-  initRowArrows();
+  loadRecommendations(token)
+    .then(() => refreshRecommendationSection())
+    .catch((error) => {
+      console.error("Failed to load recommendations", error);
+      refreshRecommendationSection();
+    });
 
   document.getElementById("menuBtn")?.addEventListener("click", toggleSidebar);
   document.getElementById("overlay")?.addEventListener("click", closeSidebar);
